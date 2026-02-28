@@ -38,9 +38,14 @@ void heading(void) {
     while((c = getch()) == '#')
         t.level++;
 
-    if(isspace(c) && t.level <= 6) {
+    if(c == ' ' && t.level <= 6) {
         while((c = getch()) == ' ')
             ;
+        push(t);
+        printf("<h%d>", t.level);
+        ungetch(c);
+    }
+    else if((c == '\n' || c == EOF) && t.level <= 6) {
         push(t);
         printf("<h%d>", t.level);
         ungetch(c);
