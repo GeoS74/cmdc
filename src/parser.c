@@ -4,7 +4,7 @@
 #include "cmdc.h"
 
 void heading(void);
-void tabs(int *blankLines);
+void tabs(int *blankLines, int *lineStart);
 
 void parser(void) {
     int c, lineStart, blankLines;
@@ -18,10 +18,7 @@ void parser(void) {
         /*обработка отступов и пустых строк*/
         if(lineStart == 1 && isspace(c)) {
             ungetch(c);
-            tabs(&blankLines);
-            lineStart = 0;  /*linestart должен обнуляться внутри tabs*/
-                            /*для простоты обнуляется здесь*/
-                            /*если внутри tabs встретится непробельный символ, то в эту ветку уже не попадёт*/
+            tabs(&blankLines, &lineStart);
         }
         /*завершение строки*/
         // else if(c == '\n') {
@@ -31,7 +28,8 @@ void parser(void) {
         //             pt->close(pt);
         //             pop();
         //         }
-        //         /*закрыть многострочный тег*/
+
+        //         /*многострочный тег*/
         //         if((pt = peek())) {
         //             // printf("blankLines = %d\n", blankLines);
 
@@ -62,8 +60,12 @@ void parser(void) {
         else if(c == '#' && peek() == NULL) {
             heading();
         }
-        else
+        else {
+            if((pt = peek()) != NULL && strcmp(pt->type, "codeBlock") == 0)
+                while(blankLines-- > 0)
+                    printf("\n");
             printf("%c", c);
+        }
     }
 
     if(peek() != NULL) {
@@ -76,7 +78,7 @@ void parser(void) {
     }
 }
 
-void tabs(int *blankLines) {
+void tabs(int *blankLines, int *lineStart) {
     struct tag *pt;
     int indent, c;
 
@@ -96,6 +98,7 @@ void tabs(int *blankLines) {
     /*это пустая строка*/
     if(c == '\n') {
         ++*blankLines;
+        *lineStart = 0;
         return;
     }
     else
