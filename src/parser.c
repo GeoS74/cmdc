@@ -61,11 +61,13 @@ void tabs(int *blankLines) {
             fprintf(stderr, "error: many indent symbols\n");
     }
 
+    /*это пустая строка*/
     if(c == '\n') {
-        /*это пустая строка*/
         ++blankLines;
         return;
     }
+    else
+        ungetch(c);
 
     /*внутри какого-то блока*/
     if((pt = peek()) != NULL) {
@@ -102,8 +104,6 @@ void tabs(int *blankLines) {
                 p += spaceChar[i] == '\t' ? 4 : 1;
         }
     }
-
-    ungetch(c);
 }
 
 void heading(void) {
