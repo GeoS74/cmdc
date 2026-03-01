@@ -23,18 +23,18 @@
     ὐ→a
     </code></pre>
     ```
-- [] Example 4:
-```
-··-·foo
+- [ ] Example 4:
+    ```
+    ··-·foo
 
-→bar
-```
-->
-```
-<ul>
-<li>
-<p>foo</p>
-<p>bar</p>
-</li>
-</ul>
-```
+    →bar
+    ```
+    ->
+    ```
+    <ul>
+    <li>
+    <p>foo</p>
+    <p>bar</p>
+    </li>
+    </ul>
+    ```
