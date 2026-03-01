@@ -15,32 +15,64 @@ void parser(void) {
     while((c = getch()) != EOF) {
         ++lineStart;
 
-        if(c == '\n' && peek() != NULL) {
+        /*обработка отступов и пустых строк*/
+        if(lineStart == 1 && isspace(c)) {
+            ungetch(c);
+            tabs(&blankLines);
+            lineStart = 0;  /*linestart должен обнуляться внутри tabs*/
+                            /*для простоты обнуляется здесь*/
+                            /*если внутри tabs встретится непробельный символ, то в эту ветку уже не попадёт*/
+        }
+        /*завершение строки*/
+        // else if(c == '\n') {
+        //     if(peek() != NULL) {
+        //         /*закрыть инлайн теги*/
+        //         while((pt = peek()) && pt->singleLine == 1) {
+        //             pt->close(pt);
+        //             pop();
+        //         }
+        //         /*закрыть многострочный тег*/
+        //         if((pt = peek())) {
+        //             // printf("blankLines = %d\n", blankLines);
+
+        //             if(strcmp(pt->type, "codeBlock") == 0) {
+        //                 // printf("blankLines = %d\n", blankLines);
+        //                 while(blankLines-- > 0)
+        //                     printf("\n");
+        //             }
+        //             else {
+        //                 pt->close(pt);
+        //                 pop();
+        //             }
+        //         }
+        //         printf("\n");
+        //     }
+        //     lineStart = 0;
+        //     blankLines = 0;
+        // }
+        else if(c == '\n' && peek() != NULL) {
             while((pt = peek()) && pt->singleLine == 1) {
                 pt->close(pt);
                 pop();
             }
             printf("\n");
             lineStart = 0;
-            continue;
         }
-
-        if(lineStart == 1 && isspace(c)) { /*первый символ пробел или таб*/
-            ungetch(c);
-            tabs(&blankLines);
-            continue;
-        }
+        /*заголовки*/
         else if(c == '#' && peek() == NULL) {
             heading();
-            continue;
         }
-
-        printf("%c", c);
+        else
+            printf("%c", c);
     }
 
     if(peek() != NULL) {
-        while((pt = pop()))
+        while((pt = pop())) {
+            // if(strcmp(pt->type, "codeBlock") == 0)
+            //     while(blankLines-- > 0)
+            //         printf("\n");
             pt->close(pt);
+        }
     }
 }
 
@@ -70,8 +102,9 @@ void tabs(int *blankLines) {
         ungetch(c);
 
     /*внутри какого-то блока*/
+    // printf("DEBUG: peek() = %p\n", (void*)peek());
+
     if((pt = peek()) != NULL) {
-        
         if(strcmp(pt->type, "codeBlock") == 0) {
             if(indent < 4) {
                 pt = pop();
