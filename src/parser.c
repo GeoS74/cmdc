@@ -49,7 +49,8 @@ void tabs(int c) {
     while((c = getch()) != '\n' && isspace(c))
         spaces += (c == '\t') ? 4 : 1;
 
-    if((pt = peek()) != NULL) { /*внутри какого-то блока*/
+    /*внутри какого-то блока*/
+    if((pt = peek()) != NULL) {
         
         if(strcmp(pt->type, "codeBlock") == 0) {
             if(spaces >= 4)
@@ -66,7 +67,8 @@ void tabs(int c) {
             spaces = 0;
         }
     }
-    else { /*вне блока*/
+    /*вне блока*/
+    else {
         if(spaces >= 4) {
             push(getTag("codeBlock"));
             printf("<pre><code>");
@@ -80,6 +82,11 @@ void tabs(int c) {
 
     while(spaces-- > 0)
         printf(" ");
+    
+    if(c == '\n') {
+        /*это пустая строка*/
+    }
+
     ungetch(c);
 }
 

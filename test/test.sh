@@ -16,17 +16,38 @@ fi
 
 cd "$SCRIPT_DIR" || exit
 
-# Номера примеров из спецификации
-examples=(1 2 3 62 63)
+TOTAL=0
+PASSED=0
 
-# Цикл по массиву
-for NUM in "${examples[@]}"; do
-    $APP < "ex${NUM}.txt" > output.txt
-    if diff -u "ex${NUM}_expect.txt" output.txt; then
-        echo -e "${GREEN}Example ${NUM} - ok${NC}"
+while read -r INPUT_FILE; do
+    TOTAL=$((TOTAL + 1))
+    
+    # Получаем базовое имя файла без пути и расширения
+    BASENAME=$(basename "$INPUT_FILE" .txt)
+    DIRNAME=$(dirname "$INPUT_FILE")
+    
+    # Ожидаемый файл лежит рядом с входным
+    EXPECT_FILE="${DIRNAME}/${BASENAME}_expect.txt"
+    
+    if [[ ! -f "$EXPECT_FILE" ]]; then
+        echo -e "${RED}${BASENAME} in ${DIRNAME} - ожидаемый файл не найден${NC}"
+        continue
+    fi
+    
+    $APP < "$INPUT_FILE" > output.txt
+    if diff -u "$EXPECT_FILE" output.txt; then
+        PASSED=$((PASSED + 1))
+        echo -e "${GREEN}${BASENAME} in ${DIRNAME} - ok${NC}"
         rm output.txt
     else
-        echo -e "${RED}Example ${NUM} - fail${NC}"
+        echo -e "${RED}${BASENAME} in ${DIRNAME} - fail${NC}"
         # exit 1
     fi
-done
+done < <(find . -type f -name "ex[0-9]*.txt" ! -name "*_expect.txt" | 
+    while read -r f; do
+        num=$(basename "$f" | sed -n 's/ex\([0-9]*\)\.txt/\1/p')
+        echo "$num:$f"
+    done | sort -n | cut -d: -f2-)
+
+# Вывод статистики
+echo -e "\n${GREEN}Passed ${PASSED}/${TOTAL} tests${NC}"
