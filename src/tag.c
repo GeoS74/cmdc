@@ -61,6 +61,10 @@ struct tag getTag(char *type) {
         t.type = "paragraph";
         t.htmlTag = "p";
     }
+    else if(strcmp(type, "codeBlock") == 0) {
+        t.type = "codeBlock";
+        t.htmlTag = "code></pre";
+    }
     else 
         fprintf(stderr, "error: unknown tag name\n");
     return t;
