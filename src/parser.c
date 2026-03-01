@@ -4,13 +4,14 @@
 #include "cmdc.h"
 
 void heading(void);
-void tabs(int c);
+void tabs(int *blankLines);
 
 void parser(void) {
-    int c, lineStart;
+    int c, lineStart, blankLines;
     struct tag *pt;
 
     lineStart = 0;
+    blankLines = 0;
     while((c = getch()) != EOF) {
         ++lineStart;
 
@@ -25,14 +26,15 @@ void parser(void) {
         }
 
         if(lineStart == 1 && isspace(c)) { /*первый символ пробел или таб*/
-            tabs(c);
+            ungetch(c);
+            tabs(&blankLines);
             continue;
         }
         else if(c == '#' && peek() == NULL) {
             heading();
             continue;
         }
-        
+
         printf("%c", c);
     }
 
@@ -42,14 +44,15 @@ void parser(void) {
     }
 }
 
-void tabs(int c) {
+void tabs(int *blankLines) {
     struct tag *pt;
+    int indent, c;
 
     char spaceChar[100] = {0};
     int pos = 0;
 
-    int indent = c == '\t' ? 4 : 1;
-    spaceChar[pos++] = c;
+    indent = 0;
+
     while(isspace(c = getch()) && c != '\n') {
         indent += (c == '\t') ? 4 : 1;
         if(pos < 100)
@@ -60,6 +63,8 @@ void tabs(int c) {
 
     if(c == '\n') {
         /*это пустая строка*/
+        ++blankLines;
+        return;
     }
 
     /*внутри какого-то блока*/
