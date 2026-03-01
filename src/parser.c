@@ -63,7 +63,7 @@ void tabs(int *blankLines) {
 
     /*это пустая строка*/
     if(c == '\n') {
-        ++blankLines;
+        ++*blankLines;
         return;
     }
     else
