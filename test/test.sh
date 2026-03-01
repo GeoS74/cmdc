@@ -17,7 +17,7 @@ fi
 cd "$SCRIPT_DIR" || exit
 
 # Номера примеров из спецификации
-examples=(1 2 3)
+examples=(1 2 3 62 63)
 
 # Цикл по массиву
 for NUM in "${examples[@]}"; do
