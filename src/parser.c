@@ -72,6 +72,7 @@ void tabs(int c) {
         if(spaces >= 4) {
             push(getTag("codeBlock"));
             printf("<pre><code>");
+            spaces -= 4;
         }
         else
             spaces = 0;
