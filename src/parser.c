@@ -79,6 +79,7 @@ void tabs(int *blankLines) {
                 push(getTag("paragraph"));
                 printf("\n<p>");
                 indent = 0;
+                *blankLines = 0;
             }
             /*здесь indent не сбрасывается*/
         }
