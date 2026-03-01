@@ -41,7 +41,7 @@ while read -r INPUT_FILE; do
         rm output.txt
     else
         echo -e "${RED}${BASENAME} in ${DIRNAME} - fail${NC}"
-        # exit 1
+        exit 1
     fi
 done < <(find . -type f -name "ex[0-9]*.txt" ! -name "*_expect.txt" | 
     while read -r f; do

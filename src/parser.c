@@ -45,45 +45,54 @@ void parser(void) {
 void tabs(int c) {
     struct tag *pt;
 
-    int spaces = c == '\t' ? 4 : 1;
-    while((c = getch()) != '\n' && isspace(c))
-        spaces += (c == '\t') ? 4 : 1;
+    char spaceChar[100] = {0};
+    int pos = 0;
+
+    int indent = c == '\t' ? 4 : 1;
+    spaceChar[pos++] = c;
+    while(isspace(c = getch()) && c != '\n') {
+        indent += (c == '\t') ? 4 : 1;
+        if(pos < 100)
+            spaceChar[pos++] = c;
+        else
+            fprintf(stderr, "error: many indent symbols\n");
+    }
+
+    if(c == '\n') {
+        /*это пустая строка*/
+    }
 
     /*внутри какого-то блока*/
     if((pt = peek()) != NULL) {
         
         if(strcmp(pt->type, "codeBlock") == 0) {
-            if(spaces >= 4)
-                spaces -= 4;
+            if(indent >= 4)
+                indent -= 4;
             else {
                 pt = pop();
                 pt->close(pt);
                 push(getTag("paragraph"));
                 printf("\n<p>");
-                spaces = 0;
+                indent = 0;
             }
         }
         else if(strcmp(pt->type, "paragraph") == 0) {
-            spaces = 0;
+            indent = 0;
         }
     }
     /*вне блока*/
     else {
-        if(spaces >= 4) {
+        if(indent >= 4) {
             push(getTag("codeBlock"));
             printf("<pre><code>");
-            spaces -= 4;
+            indent -= 4;
         }
         else
-            spaces = 0;
+            indent = 0;
     }
 
-    while(spaces-- > 0)
+    while(indent-- > 0)
         printf(" ");
-    
-    if(c == '\n') {
-        /*это пустая строка*/
-    }
 
     ungetch(c);
 }
