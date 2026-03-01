@@ -15,4 +15,10 @@
 - [x] Example 3: 
 ```
 ····a→a
-····ὐ→a```-> `<pre><code>foo→baz→→bim</code></pre>`
+····ὐ→a```
+-> 
+```
+<pre><code>a→a
+ὐ→a
+</code></pre>
+```
