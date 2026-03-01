@@ -66,15 +66,14 @@ void tabs(int c) {
     if((pt = peek()) != NULL) {
         
         if(strcmp(pt->type, "codeBlock") == 0) {
-            if(indent >= 4)
-                indent -= 4;
-            else {
+            if(indent < 4) {
                 pt = pop();
                 pt->close(pt);
                 push(getTag("paragraph"));
                 printf("\n<p>");
                 indent = 0;
             }
+            /*здесь indent не сбрасывается*/
         }
         else if(strcmp(pt->type, "paragraph") == 0) {
             indent = 0;
@@ -82,17 +81,22 @@ void tabs(int c) {
     }
     /*вне блока*/
     else {
-        if(indent >= 4) {
+        if(indent < 4)
+            indent = 0;
+        else {
             push(getTag("codeBlock"));
             printf("<pre><code>");
-            indent -= 4;
         }
-        else
-            indent = 0;
     }
 
-    while(indent-- > 0)
-        printf(" ");
+    if(indent) {
+        for(int i = 0, p = 0; i < pos; ++i) {
+            if(p >= 4)
+                printf("%c", spaceChar[i]);
+            else
+                p += spaceChar[i] == '\t' ? 4 : 1;
+        }
+    }
 
     ungetch(c);
 }
