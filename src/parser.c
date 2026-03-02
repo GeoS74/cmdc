@@ -6,6 +6,7 @@
 void heading(void);
 void tabs(int *blankLines, int *lineStart);
 void newLine(int *blankLines, int *lineStart);
+void paragraph(void);
 
 void parser(void) {
     int c, lineStart, blankLines;
@@ -37,17 +38,21 @@ void parser(void) {
         else if(c == '#' && peek() == NULL) {
             heading();
         }
+        /*любой не пробельный символ вне блоков*/
+        else if(peek() == NULL) {
+            paragraph();
+        }
         else {
-            if((pt = peek()) != NULL && strcmp(pt->type, "codeBlock") == 0)
-                while(blankLines-- > 0)
-                    printf("\n");
+            // if((pt = peek()) != NULL && strcmp(pt->type, "codeBlock") == 0)
+            //     while(blankLines-- > 0)
+            //         printf("\n");
             printf("%c", c);
         }
     }
 
     if(peek() != NULL) {
         while((pt = pop())) {
-            if(strcmp(pt->type, "codeBlock") == 0) {
+            if(pt->type == CODE_BLOCK) {
                 // while(blankLines-- > 0)
                 //     printf("\n");
                 /*перед закрытием блока должен быть перенос строки */
@@ -57,6 +62,10 @@ void parser(void) {
             pt->close(pt);
         }
     }
+}
+
+void paragraph(void) {
+
 }
 
 void newLine(int *blankLines, int *lineStart) {
@@ -72,7 +81,7 @@ void newLine(int *blankLines, int *lineStart) {
     /*многострочный тег*/
     if((pt = peek())) {
 
-        if(strcmp(pt->type, "codeBlock") == 0) {
+        if(pt->type == CODE_BLOCK) {
             while((*blankLines)-- > 0)
                 printf("\n");
         }
@@ -114,22 +123,18 @@ void tabs(int *blankLines, int *lineStart) {
         ungetch(c);
 
     /*внутри какого-то блока*/
-    // printf("DEBUG: peek() = %p\n", (void*)peek());
-
     if((pt = peek()) != NULL) {
-        if(strcmp(pt->type, "codeBlock") == 0) {
+        if(pt->type == CODE_BLOCK) {
             if(indent < 4) {
                 pt = pop();
                 pt->close(pt);
                 printf("\n");
-                // push(getTag("paragraph"));
-                // printf("\n<p>");
                 indent = 0;
                 *blankLines = 0;
             }
             /*здесь indent не сбрасывается*/
         }
-        else if(strcmp(pt->type, "paragraph") == 0) {
+        else if(pt->type == PARAGRAPH) {
             indent = 0;
         }
     }
@@ -138,7 +143,9 @@ void tabs(int *blankLines, int *lineStart) {
         if(indent < 4)
             indent = 0;
         else {
-            push(getTag("codeBlock"));
+            struct tag t = getTag(CODE_BLOCK);
+            t.kind = INDENTED;
+            push(t);
             printf("<pre><code>");
         }
     }
@@ -157,7 +164,7 @@ void heading(void) {
     int c;
     struct tag t;
 
-    t = getTag("heading");
+    t = getTag(HEADING);
     while((c = getch()) == '#')
         t.level++;
 
@@ -174,7 +181,7 @@ void heading(void) {
         ungetch(c);
     }
     else {
-        push(getTag("paragraph"));
+        push(getTag(PARAGRAPH));
         printf("<p>");
         while(t.level-- > 0)
             printf("#");

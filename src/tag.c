@@ -42,31 +42,36 @@ static void printCloseTag(struct tag *self) {
         fprintf(stderr, "error: htmlTag is NULL\n");
 }
 
-struct tag getTag(char *type) {
+struct tag getTag(enum blockType type) {
     struct tag t;
-    t.type = NULL;
+    t.type = NONE_TYPE;
     t.htmlTag = NULL;
     t.className = NULL;
     t.level = 0;
     t.singleLine = 0;
     t.close = printCloseTag;
+    t.kind = NONE_KIND;
 
-    if(strcmp(type, "heading") == 0) {
-        t.type = "heading";
-        t.htmlTag = "h";
-        t.level = 1;
-        t.singleLine = 1;
+    switch(type) {
+        case HEADING:
+            t.type = HEADING;
+            t.htmlTag = "h";
+            t.level = 1;
+            t.singleLine = 1;
+            break;
+        case PARAGRAPH:
+            t.type = PARAGRAPH;
+            t.htmlTag = "p";
+            break;
+        case CODE_BLOCK:
+            t.type = CODE_BLOCK;
+            t.htmlTag = "code></pre";
+            t.kind = FENCED;
+            break;
+        default:
+            fprintf(stderr, "error: unknown tag name\n");
+            break;
     }
-    else if(strcmp(type, "paragraph") == 0) {
-        t.type = "paragraph";
-        t.htmlTag = "p";
-    }
-    else if(strcmp(type, "codeBlock") == 0) {
-        t.type = "codeBlock";
-        t.htmlTag = "code></pre";
-    }
-    else 
-        fprintf(stderr, "error: unknown tag name\n");
     return t;
 }
 
