@@ -40,6 +40,17 @@
     </li>
     </ul>
     ```
+- [x] Example 8:
+    ```
+    ····foo
+    →bar
+    ```
+    -> 
+    ```
+    <pre><code>foo
+    bar
+    </code></pre>
+    ```
 - [x] Example 10: `#→Foo` -> `<h1>Foo</h1>`
 - [x] Example 62:
     ```

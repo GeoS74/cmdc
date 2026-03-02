@@ -119,12 +119,11 @@ void tabs(int *blankLines, int *lineStart) {
     if((pt = peek()) != NULL) {
         if(strcmp(pt->type, "codeBlock") == 0) {
             if(indent < 4) {
-                /*перед закрытием блока должен быть перенос строки */
-                printf("\n");
                 pt = pop();
                 pt->close(pt);
-                push(getTag("paragraph"));
-                printf("\n<p>");
+                printf("\n");
+                // push(getTag("paragraph"));
+                // printf("\n<p>");
                 indent = 0;
                 *blankLines = 0;
             }
