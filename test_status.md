@@ -88,3 +88,4 @@
     <pre><code># foo
     </code></pre>
     ```
+- [x] Example 75: `#·foo#` -> `<h1>foo#</h1>`
