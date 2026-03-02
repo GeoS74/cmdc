@@ -71,6 +71,17 @@
     <h6>foo</h6>
     ```
 - [x] Example 63: `#######·foo` -> `<p>#######·foo</p>`
+- [x] Example 64:
+    ```
+    #5 bolt
+
+    #hashtag
+    ```
+    ->
+    ```
+    <<p>#5 bolt</p>
+    <p>#hashtag</p>
+    ```
 - [x] Example 68:
     ```
     ·###·foo
