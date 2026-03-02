@@ -83,3 +83,8 @@
     <h2>foo</h2>
     <h1>foo</h1>
     ```
+- [x] Example 69: `····#·foo` -> 
+    ```
+    <pre><code># foo
+    </code></pre>
+    ```
