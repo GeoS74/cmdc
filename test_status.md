@@ -89,3 +89,93 @@
     </code></pre>
     ```
 - [x] Example 75: `#·foo#` -> `<h1>foo#</h1>`
+- [x] Example 219:
+    ```
+    aaa
+    
+    bbb
+    ```
+    ->
+    ```
+    <p>aaa</p>
+    <p>bbb</p>
+    ```
+- [x] Example 220:
+    ```
+    aaa
+    bbb
+
+    ccc
+    ddd
+    ```
+    ->
+    ```
+    <p>aaa
+    bbb</p>
+    <p>ccc
+    ddd</p>
+    ```
+- [x] Example 221:
+    ```
+    aaa
+
+    bbb
+    ```
+    ->
+    ```
+    <p>aaa</p>
+    <p>bbb</p>
+    ```
+- [x] Example 222:
+    ```
+    ··aaa
+    ·bbb
+    ```
+    ->
+    ```
+    <p>aaa
+    bbb</p>
+    ```
+- [x] Example 223:
+    ```
+    aaa
+    ·············bbb
+    ·······································ccc
+    ```
+    ->
+    ```
+    <p>aaa
+    bbb
+    ccc</p>
+    ```
+- [x] Example 224:
+    ```
+    ···aaa
+    bbb
+    ```
+    ->
+    ```
+    <p>aaa
+    bbb</p>
+    ```
+- [x] Example 225:
+    ```
+    ····aaa
+    bbb
+    ```
+    ->
+    ```
+    <pre><code>aaa
+    </code></pre>
+    <p>bbb</p>
+    ```
+- [ ] Example 226:
+    ```
+    aaa·····
+    bbb·····
+    ```
+    ->
+    ```
+    <p>aaa<br />
+    bbb</p>
+    ```

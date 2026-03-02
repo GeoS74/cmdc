@@ -6,7 +6,7 @@
 void heading(void);
 void tabs(int *blankLines, int *lineStart);
 void newLine(int *blankLines, int *lineStart);
-void paragraph(void);
+void paragraph(int *blankLines, int *lineStart);
 
 void parser(void) {
     int c, lineStart, blankLines;
@@ -39,8 +39,9 @@ void parser(void) {
             heading();
         }
         /*любой не пробельный символ вне блоков*/
-        else if(peek() == NULL) {
-            paragraph();
+        else if(lineStart == 1) {
+            ungetch(c);
+            paragraph(&blankLines, &lineStart);
         }
         else {
             // if((pt = peek()) != NULL && strcmp(pt->type, "codeBlock") == 0)
@@ -50,6 +51,7 @@ void parser(void) {
         }
     }
 
+    /*финальное закрытие всех блоков*/
     if(peek() != NULL) {
         while((pt = pop())) {
             if(pt->type == CODE_BLOCK) {
@@ -64,8 +66,31 @@ void parser(void) {
     }
 }
 
-void paragraph(void) {
+void paragraph(int *blankLines, int *lineStart) {
+    struct tag *pt;
 
+    if((pt = peek()) != NULL) {
+        if(pt->type == CODE_BLOCK && pt->kind == INDENTED) {
+            pt = pop();
+            pt->close(pt);
+            *blankLines = 0;
+            *lineStart = 0;
+        }
+        else if(pt->type == PARAGRAPH) {
+            if(*blankLines > 0) {
+                pt = pop();
+                pt->close(pt);
+                *blankLines = 0;
+                *lineStart = 0;
+            }
+        }
+        printf("\n");
+    }
+    else {
+        push(getTag(PARAGRAPH));
+        printf("<p>");
+    }
+     
 }
 
 void newLine(int *blankLines, int *lineStart) {
@@ -85,11 +110,17 @@ void newLine(int *blankLines, int *lineStart) {
             while((*blankLines)-- > 0)
                 printf("\n");
         }
-        else {
-            pt->close(pt);
-            pop();
+        else if(pt->type == PARAGRAPH) {
+            *lineStart = 0;
+            *blankLines = 0;
+            return;
         }
+        // else {
+        //     pt->close(pt);
+        //     pop();
+        // }
     }
+
     printf("\n");
             
     *lineStart = 0;
@@ -124,7 +155,7 @@ void tabs(int *blankLines, int *lineStart) {
 
     /*внутри какого-то блока*/
     if((pt = peek()) != NULL) {
-        if(pt->type == CODE_BLOCK) {
+        if(pt->type == CODE_BLOCK && pt->kind == INDENTED) {
             if(indent < 4) {
                 pt = pop();
                 pt->close(pt);
@@ -158,6 +189,8 @@ void tabs(int *blankLines, int *lineStart) {
                 p += spaceChar[i] == '\t' ? 4 : 1;
         }
     }
+    else
+        *lineStart = 0;
 }
 
 void heading(void) {
