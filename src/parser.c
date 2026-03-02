@@ -5,6 +5,7 @@
 
 void heading(void);
 void tabs(int *blankLines, int *lineStart);
+void newLine(int *blankLines, int *lineStart);
 
 void parser(void) {
     int c, lineStart, blankLines;
@@ -21,41 +22,17 @@ void parser(void) {
             tabs(&blankLines, &lineStart);
         }
         /*завершение строки*/
-        // else if(c == '\n') {
-        //     if(peek() != NULL) {
-        //         /*закрыть инлайн теги*/
-        //         while((pt = peek()) && pt->singleLine == 1) {
-        //             pt->close(pt);
-        //             pop();
-        //         }
-
-        //         /*многострочный тег*/
-        //         if((pt = peek())) {
-        //             // printf("blankLines = %d\n", blankLines);
-
-        //             if(strcmp(pt->type, "codeBlock") == 0) {
-        //                 // printf("blankLines = %d\n", blankLines);
-        //                 while(blankLines-- > 0)
-        //                     printf("\n");
-        //             }
-        //             else {
-        //                 pt->close(pt);
-        //                 pop();
-        //             }
-        //         }
-        //         printf("\n");
-        //     }
-        //     lineStart = 0;
-        //     blankLines = 0;
-        // }
-        else if(c == '\n' && peek() != NULL) {
-            while((pt = peek()) && pt->singleLine == 1) {
-                pt->close(pt);
-                pop();
-            }
-            printf("\n");
-            lineStart = 0;
+        else if(c == '\n') {
+            newLine(&blankLines, &lineStart);
         }
+        // else if(c == '\n' && peek() != NULL) {
+        //     while((pt = peek()) && pt->singleLine == 1) {
+        //         pt->close(pt);
+        //         pop();
+        //     }
+        //     printf("\n");
+        //     lineStart = 0;
+        // }
         /*заголовки*/
         else if(c == '#' && peek() == NULL) {
             heading();
@@ -70,12 +47,44 @@ void parser(void) {
 
     if(peek() != NULL) {
         while((pt = pop())) {
-            // if(strcmp(pt->type, "codeBlock") == 0)
-            //     while(blankLines-- > 0)
-            //         printf("\n");
+            if(strcmp(pt->type, "codeBlock") == 0) {
+                // while(blankLines-- > 0)
+                //     printf("\n");
+                /*перед закрытием блока должен быть перенос строки */
+                printf("\n");
+            }
+                 
             pt->close(pt);
         }
     }
+}
+
+void newLine(int *blankLines, int *lineStart) {
+    struct tag *pt;
+
+    if(peek() != NULL) {
+        /*закрыть инлайн теги*/
+        while((pt = peek()) && pt->singleLine == 1) {
+            pt->close(pt);
+            pop();
+        }
+    }        
+    /*многострочный тег*/
+    if((pt = peek())) {
+
+        if(strcmp(pt->type, "codeBlock") == 0) {
+            while((*blankLines)-- > 0)
+                printf("\n");
+        }
+        else {
+            pt->close(pt);
+            pop();
+        }
+    }
+    printf("\n");
+            
+    *lineStart = 0;
+    *blankLines = 0;
 }
 
 void tabs(int *blankLines, int *lineStart) {
