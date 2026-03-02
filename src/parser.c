@@ -119,6 +119,8 @@ void tabs(int *blankLines, int *lineStart) {
     if((pt = peek()) != NULL) {
         if(strcmp(pt->type, "codeBlock") == 0) {
             if(indent < 4) {
+                /*перед закрытием блока должен быть перенос строки */
+                printf("\n");
                 pt = pop();
                 pt->close(pt);
                 push(getTag("paragraph"));
@@ -160,7 +162,7 @@ void heading(void) {
     while((c = getch()) == '#')
         t.level++;
 
-    if(c == ' ' && t.level <= 6) {
+    if((c == ' ' || c == '\t') && t.level <= 6) {
         while((c = getch()) == ' ')
             ;
         push(t);

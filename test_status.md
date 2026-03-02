@@ -40,6 +40,7 @@
     </li>
     </ul>
     ```
+- [x] Example 10: `#→Foo` -> `<h1>Foo</h1>`
 - [x] Example 62:
     ```
     #·foo
