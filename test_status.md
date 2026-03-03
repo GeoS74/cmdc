@@ -1,9 +1,10 @@
-### Статус поддержки CommonMark (v0.31.2)
+# Статус поддержки CommonMark (v0.31.2)
 
 Условные обозначения: 
 - `→` означает символ табуляции,
 - `·` означает символ пробела.
 
+### Tabs
 - [x] Example 1: `→foo→baz→→bim` -> 
     ```
     <pre><code>foo→baz→→bim
@@ -52,6 +53,7 @@
     </code></pre>
     ```
 - [x] Example 10: `#→Foo` -> `<h1>Foo</h1>`
+### ATX headings
 - [x] Example 62:
     ```
     #·foo
@@ -100,6 +102,125 @@
     </code></pre>
     ```
 - [x] Example 75: `#·foo#` -> `<h1>foo#</h1>`
+### Indented code blocks
+- [x] Example 107:
+    ```
+    ····a simple
+    ······indented code block
+    ```
+    ->
+    ```
+    <pre><code>a simple
+      indented code block
+    </code></pre>
+    ```
+- [x] Example 111:
+    ```
+    ····chunk1
+
+    ····chunk2
+    ··
+    ·
+    ·
+    ····chunk3
+    ```
+    ->
+    ```
+    <pre><code>chunk1
+
+    chunk2
+
+
+
+    chunk3
+    </code></pre>
+    ```
+- [x] Example 112:
+    ```
+    ····chunk1
+    ······
+    ······chunk2
+    ```
+    ->
+    ```
+    <pre><code>chunk1
+  
+      chunk2
+    </code></pre>
+    ```
+- [x] Example 113:
+    ```
+    Foo
+    ····bar
+    ```
+    ->
+    ```
+    <p>Foo
+    bar</p>
+    ```
+- [x] Example 114:
+    ```
+    ····foo
+    bar
+    ```
+    ->
+    ```
+    <pre><code>foo
+    </code></pre>
+    <p>bar</p>
+    ```
+- [ ] Example 115:
+    ```
+    # Heading
+    ····foo
+    Heading
+    ------
+    ····foo
+    ----
+    ```
+    ->
+    ```
+    <h1>Heading</h1>
+    <pre><code>foo
+    </code></pre>
+    <h2>Heading</h2>
+    <pre><code>foo
+    </code></pre>
+    <hr />
+    ```
+- [x] Example 116:
+    ```
+    ········foo
+    ····bar
+    ```
+    ->
+    ```
+    <pre><code>    foo
+    bar
+    </code></pre>
+    ```
+- [x] Example 117:
+    ```
+
+    ····
+    ····foo
+    ····
+    ```
+    ->
+    ```
+    <pre><code>foo
+    </code></pre>
+    ```
+- [x] Example 118:
+    ```
+    ····foo··
+    ```
+    ->
+    ```
+    <pre><code>foo  
+    </code></pre>
+    ```
+### Paragraphs
 - [x] Example 219:
     ```
     aaa
@@ -190,6 +311,7 @@
     <p>aaa<br />
     bbb</p>
     ```
+### Blank lines
 - [x] Example 227:
     ```
       

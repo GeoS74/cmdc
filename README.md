@@ -15,7 +15,7 @@
 - Терминальные блоки (Leaf blocks) - не поддерживается
 - Заголовки (Atx headings) - частично
 - Заголовки Setex (Setext headings ) - не поддерживается
-- Блоки кода с отступами (Indented code blocks ) - *
+- Блоки кода с отступами (Indented code blocks ) - частично
 - Огороженные блоки кода (Fenced code blocks) - не поддерживается
 - HTML blocks - не поддерживается
 - Определения ссылок (Link reference definitions) - не поддерживается

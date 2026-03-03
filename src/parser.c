@@ -58,8 +58,9 @@ void parser(void) {
             if(pt->type == CODE_BLOCK) {
                 // while(blankLines-- > 0)
                 //     printf("\n");
-                /*перед закрытием блока должен быть перенос строки */
-                printf("\n");
+                /*если не было переноса строки перед закрытием блока вывести его*/
+                if(blankLines == 0)
+                    printf("\n");
             }
                  
             pt->close(pt);
@@ -108,7 +109,7 @@ void newLine(int *blankLines, int *lineStart) {
     if((pt = peek())) {
 
         if(pt->type == CODE_BLOCK) {
-            while((*blankLines)-- > 0)
+            for(; *blankLines > 0; --*blankLines)
                 printf("\n");
         }
         else if(pt->type == PARAGRAPH) {
@@ -146,7 +147,7 @@ void tabs(int *blankLines, int *lineStart) {
     }
 
     /*это пустая строка*/
-    if(c == '\n') {
+    if(c == '\n' || c == EOF) {
         ++*blankLines;
         *lineStart = 0;
         return;
@@ -164,6 +165,11 @@ void tabs(int *blankLines, int *lineStart) {
                 indent = 0;
                 *blankLines = 0;
             }
+            else {
+                /*вывести пустые строки внутри блока кода*/
+                for(; *blankLines > 0; --*blankLines)
+                    printf("\n");
+            }
             /*здесь indent не сбрасывается*/
             /*отступы внутри кодового блока должны быть выведены*/
         }
@@ -180,6 +186,7 @@ void tabs(int *blankLines, int *lineStart) {
             t.kind = INDENTED;
             push(t);
             printf("<pre><code>");
+            *blankLines = 0;
         }
     }
 
