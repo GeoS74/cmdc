@@ -64,6 +64,30 @@
     ```
 - [x] Example 13:
     `\→\A\a\ \3\φ\«` -> `<p>\→\A\a\ \3\φ\«</p>`
+- [x] Example 16:
+    ```
+    foo\
+    bar
+    ```
+    -> 
+    ```
+    <p>foo<br />
+    bar</p>
+    ```
+- [ ] Example 17: 
+    ```
+    `` \[\` ``
+    ``` 
+    -> 
+    ```
+    <pre><code>\[\]
+    </code></pre>
+    ```
+- [x] Example 18: `····\[\]` -> 
+    ```
+    <pre><code>\[\]
+    </code></pre>
+    ```
 ### ATX headings
 - [x] Example 62:
     ```

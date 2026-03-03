@@ -8,6 +8,7 @@ void tabs(int *blankLines, int *lineStart);
 void newLine(int *blankLines, int *lineStart);
 void paragraph(int *blankLines, int *lineStart);
 void printEscapedChar(int c);
+void backslash(void);
 
 void parser(void) {
     int c, lineStart, blankLines;
@@ -46,7 +47,7 @@ void parser(void) {
             paragraph(&blankLines, &lineStart);
         }
         else if(c == '\\') {
-            printEscapedChar(c = getch());
+            backslash();
         }
         else {
             // if((pt = peek()) != NULL && strcmp(pt->type, "codeBlock") == 0)
@@ -237,6 +238,17 @@ void heading(void) {
             printf("#");
         ungetch(c);
     }
+}
+
+void backslash(void) {
+    struct tag *pt;
+    int c;
+
+    c = getch();
+    if((pt = peek()) != NULL && pt->type == CODE_BLOCK)
+        printf("\\%c", c);
+    else
+        printEscapedChar(c);
 }
 
 void printEscapedChar(int c) {
