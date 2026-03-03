@@ -37,4 +37,7 @@ void push(struct tag t);
 struct tag *pop(void);
 struct tag *peek(void);
 
+/*печатает экранируемый символ*/
+void printEscapedChar(int c);
+
 #endif

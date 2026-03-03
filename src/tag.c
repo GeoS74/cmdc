@@ -73,5 +73,3 @@ struct tag getTag(enum blockType type) {
     }
     return t;
 }
-
- 

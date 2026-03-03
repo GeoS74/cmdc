@@ -7,6 +7,7 @@ void heading(void);
 void tabs(int *blankLines, int *lineStart);
 void newLine(int *blankLines, int *lineStart);
 void paragraph(int *blankLines, int *lineStart);
+void printEscapedChar(int c);
 
 void parser(void) {
     int c, lineStart, blankLines;
@@ -43,6 +44,9 @@ void parser(void) {
         else if(lineStart == 1) {
             ungetch(c);
             paragraph(&blankLines, &lineStart);
+        }
+        else if(c == '\\') {
+            printEscapedChar(c = getch());
         }
         else {
             // if((pt = peek()) != NULL && strcmp(pt->type, "codeBlock") == 0)
@@ -232,5 +236,44 @@ void heading(void) {
         while(t.level-- > 0)
             printf("#");
         ungetch(c);
+    }
+}
+
+void printEscapedChar(int c) {
+    switch(c) {
+        case '!': printf("!"); break;
+        case '#': printf("#"); break;
+        case '$': printf("$"); break;
+        case '%': printf("%%"); break;
+        case '\'': printf("'"); break;
+        case '(': printf("("); break;
+        case ')': printf(")"); break;
+        case '*': printf("*"); break;
+        case '+': printf("+"); break;
+        case ',': printf(","); break;
+        case '-': printf("-"); break;
+        case '.': printf("."); break;
+        case '/': printf("/"); break;
+        case ':': printf(":"); break;
+        case ';': printf(";"); break;
+        case '=': printf("="); break;
+        case '?': printf("?"); break;
+        case '@': printf("@"); break;
+        case '[': printf("["); break;
+        case ']': printf("]"); break;
+        case '\\': printf("\\"); break;
+        case '^': printf("^"); break;
+        case '_': printf("_"); break;
+        case '`': printf("`"); break;
+        case '{': printf("{"); break;
+        case '}': printf("}"); break;
+        case '|': printf("|"); break;
+        case '~': printf("~"); break;
+        case '&': printf("&amp;"); break;
+        case '<': printf("&lt;"); break;
+        case '>': printf("&gt;"); break;
+        case '"': printf("&quot;"); break;
+        case '\n': printf("<br />\n"); break;
+        default: printf("\\%c", c); break;
     }
 }
