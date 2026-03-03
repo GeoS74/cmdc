@@ -56,7 +56,6 @@ struct tag getTag(enum blockType type) {
         case HEADING:
             t.type = HEADING;
             t.htmlTag = "h";
-            t.level = 1;
             t.singleLine = 1;
             break;
         case PARAGRAPH:

@@ -36,6 +36,7 @@ void parser(void) {
         // }
         /*заголовки*/
         else if(c == '#' && peek() == NULL) {
+            ungetch(c);
             heading();
         }
         /*любой не пробельный символ вне блоков*/
