@@ -165,6 +165,7 @@ void tabs(int *blankLines, int *lineStart) {
                 *blankLines = 0;
             }
             /*здесь indent не сбрасывается*/
+            /*отступы внутри кодового блока должны быть выведены*/
         }
         else if(pt->type == PARAGRAPH) {
             indent = 0;
@@ -194,6 +195,10 @@ void tabs(int *blankLines, int *lineStart) {
         *lineStart = 0;
 }
 
+/*
+первый считанный символ гарантировано будет #
+может открыть paragraph
+*/
 void heading(void) {
     int c;
     struct tag t;
