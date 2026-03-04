@@ -363,6 +363,27 @@
     <p>aaa</p>
     <h1>aaa</h1>
     ```
+### Soft line breaks
+- [x] Example 648:
+    ```
+    foo
+    baz
+    ```
+    ->
+    ```
+    <p>foo
+    baz</p>
+    ```
+- [x] Example 649:
+    ```
+    foo·
+    ·baz
+    ```
+    ->
+    ```
+    <p>foo
+    baz</p>
+    ```
 ### Textual content
 - [x] Example 650: `hello·$.;'there` -> `<p>hello·$.;'there</p>`
 - [x] Example 651: `Foo·χρῆν` -> `<p>Foo·χρῆν</p>`
