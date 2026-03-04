@@ -363,3 +363,7 @@
     <p>aaa</p>
     <h1>aaa</h1>
     ```
+### Textual content
+- [x] Example 650: `hello·$.;'there` -> `<p>hello·$.;'there</p>`
+- [x] Example 651: `Foo·χρῆν` -> `<p>Foo·χρῆν</p>`
+- [x] Example 652: `Multiple·····spaces` -> `<p>Multiple·····spaces</p>`

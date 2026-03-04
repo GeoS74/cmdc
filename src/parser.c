@@ -13,20 +13,20 @@ int bufferInlineSpaces(int c, char *spaceChar, int *pos);
 void flushBufferInlineSpaces(char *spaceChar, int *pos);
 
 void parser(void) {
-    int c, lineStart, blankLines;
-    struct tag *pt;
-
+    /*переменные для буферизации пробелов между символами и в конце строки*/
     char spaceChar[100] = {0};
     int pos = 0;
+
+    int c, lineStart, blankLines;
+    struct tag *pt;
 
     lineStart = 0;
     blankLines = 0;
     while((c = getch()) != EOF) {
         ++lineStart;
 
-        if(bufferInlineSpaces(c, spaceChar, &pos)) {
+        if(bufferInlineSpaces(c, spaceChar, &pos))
             continue;
-        }
 
         /*обработка отступов и пустых строк*/
         if(lineStart == 1 && isspace(c)) {
@@ -47,6 +47,7 @@ void parser(void) {
             ungetch(c);
             paragraph(&blankLines, &lineStart);
         }
+        /*экранирование*/
         else if(c == '\\') {
             backslash();
         }
@@ -64,7 +65,6 @@ void parser(void) {
                 if(blankLines == 0)
                     printf("\n");
             }
-                 
             pt->close(pt);
         }
     }
