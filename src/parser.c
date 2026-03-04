@@ -9,15 +9,24 @@ void newLine(int *blankLines, int *lineStart);
 void paragraph(int *blankLines, int *lineStart);
 void printEscapedChar(int c);
 void backslash(void);
+int bufferInlineSpaces(int c, char *spaceChar, int *pos);
+void flushBufferInlineSpaces(char *spaceChar, int *pos);
 
 void parser(void) {
     int c, lineStart, blankLines;
     struct tag *pt;
 
+    char spaceChar[100] = {0};
+    int pos = 0;
+
     lineStart = 0;
     blankLines = 0;
     while((c = getch()) != EOF) {
         ++lineStart;
+
+        if(bufferInlineSpaces(c, spaceChar, &pos)) {
+            continue;
+        }
 
         /*обработка отступов и пустых строк*/
         if(lineStart == 1 && isspace(c)) {
@@ -28,14 +37,6 @@ void parser(void) {
         else if(c == '\n') {
             newLine(&blankLines, &lineStart);
         }
-        // else if(c == '\n' && peek() != NULL) {
-        //     while((pt = peek()) && pt->singleLine == 1) {
-        //         pt->close(pt);
-        //         pop();
-        //     }
-        //     printf("\n");
-        //     lineStart = 0;
-        // }
         /*заголовки*/
         else if(c == '#' && peek() == NULL) {
             ungetch(c);
@@ -50,9 +51,6 @@ void parser(void) {
             backslash();
         }
         else {
-            // if((pt = peek()) != NULL && strcmp(pt->type, "codeBlock") == 0)
-            //     while(blankLines-- > 0)
-            //         printf("\n");
             printf("%c", c);
         }
     }
@@ -61,8 +59,7 @@ void parser(void) {
     if(peek() != NULL) {
         while((pt = pop())) {
             if(pt->type == CODE_BLOCK) {
-                // while(blankLines-- > 0)
-                //     printf("\n");
+                flushBufferInlineSpaces(spaceChar, &pos);
                 /*если не было переноса строки перед закрытием блока вывести его*/
                 if(blankLines == 0)
                     printf("\n");
@@ -288,4 +285,45 @@ void printEscapedChar(int c) {
         case '\n': printf("<br />\n"); break;
         default: printf("\\%c", c); break;
     }
+}
+
+/*
+буферезирует пробелы между символами и в коне строки
+возврат:
+    1 - символ был пробелом и обработан (нужен continue)
+    0 - символ требует дальнейшей обработки
+*/
+int bufferInlineSpaces(int c, char *spaceChar, int *pos) {
+    struct tag *pt;
+    static int hasContent = 0;
+
+    if(!hasContent)
+        hasContent = (c != ' ' && c != '\t');
+        
+    if(hasContent) {
+        if(c == ' ' || c == '\t') {
+            spaceChar[(*pos)++] = c;
+            return 1;
+        }
+        else if(c == '\n') {
+            if((pt = peek()) != NULL && pt->type == CODE_BLOCK) {
+                for(int i = 0; i < *pos; ++i)
+                    printf("%c", spaceChar[i]);
+            }
+                *pos = 0;
+                hasContent = 0;
+        }
+        else {
+            for(int i = 0; i < *pos; ++i)
+                printf("%c", spaceChar[i]);
+            *pos = 0;
+        }
+    }
+    return 0;
+}
+/*сбрасывает буфер пробелов между символами*/
+void flushBufferInlineSpaces(char *spaceChar, int *pos) {
+    for(int i = 0; i < *pos; ++i)
+        printf("%c", spaceChar[i]);
+    *pos = 0;
 }
