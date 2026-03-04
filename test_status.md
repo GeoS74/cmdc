@@ -363,6 +363,57 @@
     <p>aaa</p>
     <h1>aaa</h1>
     ```
+### Hard line breaks
+- [x] Example 633:
+    ```
+    foo··
+    baz
+    ```
+    ->
+    ```
+    <p>foo<br />
+    baz</p>
+    ```
+- [x] Example 634:
+    ```
+    foo\
+    baz
+    ```
+    ->
+    ```
+    <p>foo<br />
+    baz</p>
+    ```
+- [x] Example 635:
+    ```
+    foo·······
+    baz
+    ```
+    ->
+    ```
+    <p>foo<br />
+    baz</p>
+    ```
+- [x] Example 636:
+    ```
+    foo··
+    ·····baz
+    ```
+    ->
+    ```
+    <p>foo<br />
+    baz</p>
+    ```
+- [ ] Example 637:
+    ```
+    foo\
+    ·····baz
+    ```
+    ->
+    ```
+    <p>foo<br />
+    baz</p>
+    ```
 ### Soft line breaks
 - [x] Example 648:
     ```

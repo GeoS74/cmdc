@@ -13,6 +13,15 @@ int bufferInlineSpaces(int c, char *spaceChar, int *pos);
 void flushBufferInlineSpaces(char *spaceChar, int *pos);
 
 void parser(void) {
+    /*
+    переменная hasContent перенесена в функцию bufferInlineSpaces
+    и объявлена как статичная, это может стать проблемой если использовать парсер в потоках.
+    Чтобы это исправить надо объявить её в основной функции парсера и
+    передавать по ссылке в bufferInlineSpaces.
+    В основной функции парсера обнулять её при получении символа '\n'
+    int hasContent = 0;
+    */
+
     /*переменные для буферизации пробелов между символами и в конце строки*/
     char spaceChar[100] = {0};
     int pos = 0;
@@ -306,12 +315,20 @@ int bufferInlineSpaces(int c, char *spaceChar, int *pos) {
             return 1;
         }
         else if(c == '\n') {
-            if((pt = peek()) != NULL && pt->type == CODE_BLOCK) {
-                for(int i = 0; i < *pos; ++i)
-                    printf("%c", spaceChar[i]);
+            if((pt = peek()) != NULL) {
+                /*внутри кодового блока оставлять пробелы в конце строк*/
+                if(pt->type == CODE_BLOCK) {
+                    for(int i = 0; i < *pos; ++i)
+                        printf("%c", spaceChar[i]);
+                }
+                /*внутри параграфа пробелы в конце строки заменить на <br />*/
+                else if(pt->type == PARAGRAPH) {
+                    if(*pos >= 2)
+                        printf("<br />");
+                }
             }
-                *pos = 0;
-                hasContent = 0;
+            *pos = 0;
+            hasContent = 0;
         }
         else {
             for(int i = 0; i < *pos; ++i)
