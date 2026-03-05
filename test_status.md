@@ -404,7 +404,7 @@
     <p>foo<br />
     baz</p>
     ```
-- [ ] Example 637:
+- [x] Example 637:
     ```
     foo\
     ·····baz
@@ -414,6 +414,10 @@
     <p>foo<br />
     baz</p>
     ```
+- [x] Example 644: `foo\` -> `<p>foo\</p>`
+- [x] Example 645: `foo··` -> `<p>foo</p>`
+- [x] Example 646: `###·foo\` -> `<h3>foo\</h3>`
+- [x] Example 647: `###·foo··` -> `<h3>foo\</h3>`
 ### Soft line breaks
 - [x] Example 648:
     ```

@@ -31,6 +31,7 @@ void parser(void) {
 
     lineStart = 0;
     blankLines = 0;
+
     while((c = getch()) != EOF) {
         ++lineStart;
 
@@ -253,6 +254,12 @@ void backslash(void) {
     c = getch();
     if((pt = peek()) != NULL && pt->type == CODE_BLOCK)
         printf("\\%c", c);
+    else if(c == '\n') {
+        printf("<br />");
+        ungetch(c);
+    }
+    else if(c == EOF)
+        printf("\\");
     else
         printEscapedChar(c);
 }
@@ -291,7 +298,6 @@ void printEscapedChar(int c) {
         case '<': printf("&lt;"); break;
         case '>': printf("&gt;"); break;
         case '"': printf("&quot;"); break;
-        case '\n': printf("<br />\n"); break;
         default: printf("\\%c", c); break;
     }
 }
