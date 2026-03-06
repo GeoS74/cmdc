@@ -67,6 +67,10 @@ struct tag getTag(enum blockType type) {
             t.htmlTag = "code></pre";
             t.kind = FENCED;
             break;
+        case THEMATIC_BREAK:
+            t.type = THEMATIC_BREAK;
+            t.htmlTag = "hr";
+            break;
         default:
             fprintf(stderr, "error: unknown tag name\n");
             break;

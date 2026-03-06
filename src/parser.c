@@ -12,6 +12,57 @@ void backslash(void);
 int bufferInlineSpaces(int c, char *spaceChar, int *pos);
 void flushBufferInlineSpaces(char *spaceChar, int *pos);
 
+
+void thematicBreak(int *lineStart) {
+    int c, initChar, count;
+
+    char buf[100] = {0};
+    int pos = 0;
+
+    initChar = getch();
+    buf[pos++] = initChar;
+    count = 1;
+
+    while((c = getch()) == initChar || c == ' ') {
+        if(c == initChar) 
+            ++count;
+
+        if(pos < 100)
+            buf[pos++] = c;
+        else
+            fprintf(stderr, "error: many indent symbols\n");
+    }
+
+    if(count >= 3) {
+        if(c == '\n') {
+            printf("<hr />\n"); // ???????????????????????
+            ungetch(c);
+        }
+             
+        else if(c == EOF)
+            printf("<hr />");
+
+        *lineStart = 0;
+    }
+    else {
+        if(peek() == NULL) {
+            push(getTag(PARAGRAPH));
+            printf("<p>");
+        }
+         
+        for(int i = 0; i < pos; ++i)
+            printf("%c", buf[i]);
+        
+        ungetch(c);
+        // if(c != EOF)
+        //     printf("%c", c);
+
+        // if(c == '\n')
+        //     *lineStart = 0;
+    }
+}
+
+
 void parser(void) {
     /*
     переменная hasContent перенесена в функцию bufferInlineSpaces
@@ -34,34 +85,49 @@ void parser(void) {
 
     while((c = getch()) != EOF) {
         ++lineStart;
-
+// printf("debug 1\n");
         if(bufferInlineSpaces(c, spaceChar, &pos))
             continue;
-
+// printf("debug 2\n");
         /*обработка отступов и пустых строк*/
         if(lineStart == 1 && isspace(c)) {
+// printf("debug 3\n");
             ungetch(c);
             tabs(&blankLines, &lineStart);
         }
         /*завершение строки*/
         else if(c == '\n') {
+// printf("debug 4\n");
             newLine(&blankLines, &lineStart);
         }
         /*заголовки*/
         else if(c == '#' && peek() == NULL) {
+// printf("debug 5\n");
             ungetch(c);
             heading();
         }
-        /*любой не пробельный символ вне блоков*/
+        /*любой не пробельный символ в начале строки*/
         else if(lineStart == 1) {
+// printf("debug 6\n");
             ungetch(c);
-            paragraph(&blankLines, &lineStart);
+
+            if(c == '*' || c == '-' || c == '_') { /*тематический разрыв*/
+// printf("debug 7\n");
+                thematicBreak(&lineStart);
+            }
+            else {
+// printf("debug 8\n");
+                paragraph(&blankLines, &lineStart);
+            }
+                 
         }
         /*экранирование*/
         else if(c == '\\') {
+// printf("debug 9\n");
             backslash();
         }
         else {
+// printf("debug 10\n");
             printf("%c", c);
         }
     }
