@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define BUFSIZE 50
+#define BUFSIZE 100
 static char buf[BUFSIZE];
 static int pos = 0;
 

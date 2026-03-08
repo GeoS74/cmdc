@@ -11,56 +11,7 @@ void printEscapedChar(int c);
 void backslash(void);
 int bufferInlineSpaces(int c, char *spaceChar, int *pos);
 void flushBufferInlineSpaces(char *spaceChar, int *pos);
-
-
-void thematicBreak(int *lineStart) {
-    int c, initChar, count;
-
-    char buf[100] = {0};
-    int pos = 0;
-
-    initChar = getch();
-    buf[pos++] = initChar;
-    count = 1;
-
-    while((c = getch()) == initChar || c == ' ') {
-        if(c == initChar) 
-            ++count;
-
-        if(pos < 100)
-            buf[pos++] = c;
-        else
-            fprintf(stderr, "error: many indent symbols\n");
-    }
-
-    if(count >= 3) {
-        if(c == '\n') {
-            printf("<hr />\n"); // ???????????????????????
-            ungetch(c);
-        }
-             
-        else if(c == EOF)
-            printf("<hr />");
-
-        *lineStart = 0;
-    }
-    else {
-        if(peek() == NULL) {
-            push(getTag(PARAGRAPH));
-            printf("<p>");
-        }
-         
-        for(int i = 0; i < pos; ++i)
-            printf("%c", buf[i]);
-        
-        ungetch(c);
-        // if(c != EOF)
-        //     printf("%c", c);
-
-        // if(c == '\n')
-        //     *lineStart = 0;
-    }
-}
+void thematicBreak(int *blankLines, int *lineStart);
 
 
 void parser(void) {
@@ -113,7 +64,7 @@ void parser(void) {
 
             if(c == '*' || c == '-' || c == '_') { /*тематический разрыв*/
 // printf("debug 7\n");
-                thematicBreak(&lineStart);
+                thematicBreak(&blankLines, &lineStart);
             }
             else {
 // printf("debug 8\n");
@@ -146,6 +97,81 @@ void parser(void) {
     }
 }
 
+void thematicBreak(int *blankLines, int *lineStart) {
+    struct tag *pt;
+    int c, initChar, count, isBreaks;
+
+    char buf[100] = {0};
+    int pos = 0;
+
+    initChar = getch();
+    buf[pos++] = initChar;
+    count = 1;
+
+    while((c = getch()) == initChar || c == ' ') {
+        if(c == initChar) 
+            ++count;
+
+        if(pos < 100)
+            buf[pos++] = c;
+        else
+            fprintf(stderr, "error: many indent symbols\n");
+    }
+
+    isBreaks = (count >= 3 && (c == '\n' || c == EOF));
+
+    /*вернуть все считанные символы обратно в поток*/
+    if(!isBreaks) {
+        ungetch(c);
+        while(pos > 0)
+            ungetch(buf[--pos]);
+    }
+
+    if((pt = peek()) != NULL) {
+        if(pt->type == CODE_BLOCK && pt->kind == INDENTED) {
+            pt = pop();
+            pt->close(pt);
+            *blankLines = 0;
+            *lineStart = 0;
+        }
+        else if(pt->type == PARAGRAPH) {
+            if(*blankLines > 0 || isBreaks) {
+                pt = pop();
+                pt->close(pt);
+                *blankLines = 0;
+                *lineStart = 0;
+            }
+        }
+        printf("\n");
+
+        if(isBreaks) {
+            printf("<hr />");
+            if(c == '\n') {
+                *blankLines = 0;
+                *lineStart = 0;
+                printf("\n");
+                // ungetch('\n');
+            }
+        }
+             
+    }
+    else {
+        if(isBreaks) {
+            printf("<hr />");
+            if(c == '\n') {
+                *blankLines = 0;
+                *lineStart = 0;
+                printf("\n");
+                ungetch('\n');
+            }
+        }
+        else {
+            push(getTag(PARAGRAPH));
+            printf("<p>");
+        }
+    }
+}
+
 void paragraph(int *blankLines, int *lineStart) {
     struct tag *pt;
 
@@ -170,9 +196,11 @@ void paragraph(int *blankLines, int *lineStart) {
         push(getTag(PARAGRAPH));
         printf("<p>");
     }
-     
 }
 
+/*
+для параграфа \n не печатается
+*/
 void newLine(int *blankLines, int *lineStart) {
     struct tag *pt;
 
