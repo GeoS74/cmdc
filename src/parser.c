@@ -242,7 +242,6 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
     int pos = 0;
 
     indent = 0;
-    // *lastIndent = indent;
 
     while(isspace(c = getch()) && c != '\n') {
         indent += (c == '\t') ? 4 : 1;
