@@ -12,8 +12,10 @@ void backslash(void);
 int bufferInlineSpaces(int c, char *spaceChar, int *pos);
 void flushBufferInlineSpaces(char *spaceChar, int *pos);
 void thematicBreak(int *blankLines, int *lineStart, int lastIndent);
-void codeBlock(int *blankLines, int *lineStart);
 
+int isFencedBlock(void);
+void codeBlock(int *blankLines, int *lineStart);
+void codeBlockInline(int *blankLines, int *lineStart);
 
 void parser(void) {
     /*
@@ -38,52 +40,46 @@ void parser(void) {
 
     while((c = getch()) != EOF) {
         ++lineStart;
-// printf("debug 1\n");
+
         if(bufferInlineSpaces(c, spaceChar, &pos))
             continue;
-// printf("debug 2\n");
+
         /*обработка отступов и пустых строк*/
         if(lineStart == 1 && isspace(c)) {
-// printf("debug 3\n");
             ungetch(c);
             tabs(&blankLines, &lineStart, &lastIndent);
         }
         /*завершение строки*/
         else if(c == '\n') {
-// printf("debug 4\n");
             lastIndent = 0; /*перенос строки сбрасывает отступы*/
             newLine(&blankLines, &lineStart);
         }
         /*заголовки*/
         else if(c == '#' && peek() == NULL) {
-// printf("debug 5\n");
             ungetch(c);
             heading();
         }
         /*любой не пробельный символ в начале строки*/
         else if(lineStart == 1) {
-// printf("debug 6 c=%c\n", c);
             ungetch(c);
 
             if(c == '`' || c == '~')
                 codeBlock(&blankLines, &lineStart);
-            else if(c == '*' || c == '-' || c == '_') { /*тематический разрыв*/
-// printf("debug 7\n");
+            else if(c == '*' || c == '-' || c == '_') /*тематический разрыв*/
                 thematicBreak(&blankLines, &lineStart, lastIndent);
-            }
-            else {
-// printf("debug 8\n");
+            else
                 paragraph(&blankLines, &lineStart);
-            }
                  
         }
         /*экранирование*/
         else if(c == '\\') {
-// printf("debug 9\n");
             backslash();
         }
+        else if(peek() != NULL && peek()->type == PARAGRAPH && c == '`') {
+            ungetch(c);
+            codeBlockInline(&blankLines, &lineStart);
+        }
         else {
-// printf("debug 10: c=%c\n", c);
             printf("%c", c);
         }
     }
@@ -102,10 +98,128 @@ void parser(void) {
     }
 }
 
-void codeBlock(int *blankLines, int *lineStart) {
-    struct tag *pt;
-    int c, initChar, count, isBreaks;
+void codeBlockInline(int *blankLines, int *lineStart){
+    int c, s, indent;
+    struct tag *pt, t;
+
+    // t = getTag(CODE_INLINE);
+    // t.level = count;
+    
+    indent = 0;
+    s = 0;
+    while((c = getch()) != EOF) {
+        if (c == '\n') {
+            if(!s) {
+                /*пустая строка, конец inline блока*/
+            }
+            s = 0;
+            indent = 0;
+        }
+        else {
+            if(!s && (c == ' ' || c == '\t')) {
+                ++indent;
+            }
+            /*в начале могут быть отступы И символ открытия кодового блока/
+            /*возможно это начало fenced блока кода*/
+            else if(!s && (c == '`' || c == '~')) {
+                ungetch(c);
+                if(isFencedBlock()) {
+                    /*это fenced блок, конец inline блока*/
+                }
+            }
+            else {
+                ++s;
+            }
+        }
+    }
 }
+
+/*
+проверяет строку на начало fenced блока
+возвращает 0 или 1
+все считанные символы возвращает в поток
+*/
+int isFencedBlock(void) {
+    int c, initChar;
+
+    char buf[500];
+    int pos = 0;
+
+    initChar = getch();
+    buf[pos++] = initChar;
+
+    while((c = getch()) == initChar) {
+        if(pos < 500)
+            buf[pos++] = c;
+        else
+            fprintf(stderr, "error: many indent symbols\n");
+    }
+    ungetch(c);
+
+    if(pos < 3) {
+        /*возврат символов в поток*/
+        while(pos > 0)
+            ungetch(buf[--pos]);
+        return 0;
+    }
+    
+    while((c = getch()) != '\n' && c != EOF) {
+        if(c == initChar)
+            break;
+
+        if(pos < 500)
+            buf[pos++] = c;
+        else
+            fprintf(stderr, "error: many indent symbols\n");
+    }
+    ungetch(c);
+
+    /*возврат символов в поток*/
+    while(pos > 0)
+        ungetch(buf[--pos]);
+
+    return c == initChar ? 0 : 1;
+}
+
+
+
+
+
+void codeBlockFenced(enum blockType type, int level);
+void codeBlock(int *blankLines, int *lineStart) {
+    int c, initChar, count;
+    enum blockType type;
+
+    initChar = getch();
+    count = 1;
+
+    while((c = getch()) == initChar)
+        if(c == initChar) 
+            ++count;
+
+    ungetch(c);
+
+    /*определить тип кодового блока и передать управление*/
+    if(count < 3) {
+        while(count-- > 0)
+            ungetch(initChar);
+        paragraph(blankLines, lineStart);
+    }
+    else {
+        type = initChar == '`' ? FENCED_BACKTICK : FENCED_TILDE;
+        codeBlockFenced(type, count);
+    }
+}
+
+void codeBlockFenced(enum blockType type, int level){
+    // struct tag *pt, t;
+
+    // t = getTag(CODE_BLOCK);
+    // t.kind = initChar == '`' ? FENCED_BACKTICK : FENCED_TILDE;
+    // t.level = count;
+}
+
+
 
 /*
 использует буфер
