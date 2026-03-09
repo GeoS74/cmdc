@@ -98,26 +98,36 @@ void parser(void) {
     }
 }
 
-void codeBlockInline(int *blankLines, int *lineStart){
-    int c, s, indent;
-    struct tag *pt, t;
 
-    // t = getTag(CODE_INLINE);
-    // t.level = count;
+void printCodeBlockInline(char *buf, int pos) {
+
+}
+
+
+void codeBlockInline(int *blankLines, int *lineStart){
+    int c, s;
     
-    indent = 0;
+    char buf[500];
+    int pos = 0;
+
     s = 0;
     while((c = getch()) != EOF) {
+        if(pos < 500)
+            buf[pos++] = c;
+        else
+            fprintf(stderr, "error: many indent symbols\n");
+
         if (c == '\n') {
             if(!s) {
                 /*пустая строка, конец inline блока*/
+                printCodeBlockInline(buf, pos);
+                return;
             }
             s = 0;
-            indent = 0;
         }
         else {
             if(!s && (c == ' ' || c == '\t')) {
-                ++indent;
+                continue;
             }
             /*в начале могут быть отступы И символ открытия кодового блока/
             /*возможно это начало fenced блока кода*/
@@ -125,17 +135,25 @@ void codeBlockInline(int *blankLines, int *lineStart){
                 ungetch(c);
                 if(isFencedBlock()) {
                     /*это fenced блок, конец inline блока*/
+                    --pos;
+                    printCodeBlockInline(buf, pos);
+                    return;
                 }
+                getch(); // вывести символ из потока
             }
             else {
                 ++s;
             }
         }
     }
+    ungetch(c); // вернуть EOF в поток
+    printCodeBlockInline(buf, pos);
+    return;
 }
 
 /*
 проверяет строку на начало fenced блока
+первый символ или ` или ~
 возвращает 0 или 1
 все считанные символы возвращает в поток
 */
