@@ -12,6 +12,7 @@ void backslash(void);
 int bufferInlineSpaces(int c, char *spaceChar, int *pos);
 void flushBufferInlineSpaces(char *spaceChar, int *pos);
 void thematicBreak(int *blankLines, int *lineStart, int lastIndent);
+void codeBlock(int *blankLines, int *lineStart);
 
 
 void parser(void) {
@@ -64,7 +65,9 @@ void parser(void) {
 // printf("debug 6 c=%c\n", c);
             ungetch(c);
 
-            if(c == '*' || c == '-' || c == '_') { /*тематический разрыв*/
+            if(c == '`' || c == '~')
+                codeBlock(&blankLines, &lineStart);
+            else if(c == '*' || c == '-' || c == '_') { /*тематический разрыв*/
 // printf("debug 7\n");
                 thematicBreak(&blankLines, &lineStart, lastIndent);
             }
@@ -99,6 +102,14 @@ void parser(void) {
     }
 }
 
+void codeBlock(int *blankLines, int *lineStart) {
+    struct tag *pt;
+    int c, initChar, count, isBreaks;
+}
+
+/*
+использует буфер
+*/
 void thematicBreak(int *blankLines, int *lineStart, int lastIndent) {
     struct tag *pt;
     int c, initChar, count, isBreaks;
@@ -120,7 +131,7 @@ void thematicBreak(int *blankLines, int *lineStart, int lastIndent) {
             fprintf(stderr, "error: many indent symbols\n");
     }
 
-    isBreaks = (count >= 3 && lastIndent < 4 && (c == '\n' || c == EOF));
+    isBreaks = (count >= 3 && lastIndent < TAB_STEP && (c == '\n' || c == EOF));
 
     /*вернуть все считанные символы обратно в поток*/
     ungetch(c);
@@ -244,7 +255,7 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
     indent = 0;
 
     while(isspace(c = getch()) && c != '\n') {
-        indent += (c == '\t') ? 4 : 1;
+        indent += (c == '\t') ? TAB_STEP : 1;
         if(pos < 100)
             spaceChar[pos++] = c;
         else
@@ -264,7 +275,7 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
     /*внутри какого-то блока*/
     if((pt = peek()) != NULL) {
         if(pt->type == CODE_BLOCK && pt->kind == INDENTED) {
-            if(indent < 4) {
+            if(indent < TAB_STEP) {
                 pt = pop();
                 pt->close(pt);
                 printf("\n");
@@ -285,7 +296,7 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
     }
     /*вне блока*/
     else {
-        if(indent < 4)
+        if(indent < TAB_STEP)
             indent = 0;
         else {
             struct tag t = getTag(CODE_BLOCK);
@@ -298,10 +309,10 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
 
     if(indent) {
         for(int i = 0, p = 0; i < pos; ++i) {
-            if(p >= 4)
+            if(p >= TAB_STEP)
                 printf("%c", spaceChar[i]);
             else
-                p += spaceChar[i] == '\t' ? 4 : 1;
+                p += spaceChar[i] == '\t' ? TAB_STEP : 1;
         }
     }
     else

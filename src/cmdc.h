@@ -1,6 +1,8 @@
 #ifndef CMDC_H
 #define CMDC_H
 
+#define TAB_STEP 4 /* шаг 1 таба в пробелах */
+
 void parser(void);
 
 int getch(void);
@@ -11,7 +13,8 @@ enum blockType {
     NONE_TYPE,
     PARAGRAPH,
     HEADING,
-    CODE_BLOCK
+    CODE_BLOCK,
+    CODE_INLINE
 };
 
 /* Роды блоков (вариации) */
