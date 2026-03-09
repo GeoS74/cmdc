@@ -432,7 +432,7 @@
     </code></pre>
     <p>bbb</p>
     ```
-- [ ] Example 226:
+- [x] Example 226:
     ```
     aaa·····
     bbb·····
