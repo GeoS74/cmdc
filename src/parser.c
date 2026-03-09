@@ -112,6 +112,12 @@ void parser(void) {
 /*
 */
 void printCodeBlockInline(char *buf, int max) {
+    // printf("\n~~~~buf~~~\n");
+    // for(int i = 0; i < max; ++i)
+    //     printf("%c", buf[i]);
+    // printf("\n~~~~~~~~\n");
+    // return;
+
     struct tag t;
     int i, f, start;
 
@@ -234,9 +240,7 @@ void codeBlockInline(int *blankLines, int *lineStart){
                 }
                 getch(); // вывести символ из потока
             }
-            else {
-                ++s;
-            }
+            ++s;
         }
     }
     ungetch(c); // вернуть EOF в поток
