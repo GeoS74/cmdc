@@ -50,6 +50,7 @@ void parser(void) {
         /*завершение строки*/
         else if(c == '\n') {
 // printf("debug 4\n");
+            lastIndent = 0; /*перенос строки сбрасывает отступы*/
             newLine(&blankLines, &lineStart);
         }
         /*заголовки*/
@@ -60,7 +61,7 @@ void parser(void) {
         }
         /*любой не пробельный символ в начале строки*/
         else if(lineStart == 1) {
-// printf("debug 6\n");
+// printf("debug 6 c=%c\n", c);
             ungetch(c);
 
             if(c == '*' || c == '-' || c == '_') { /*тематический разрыв*/
@@ -79,7 +80,7 @@ void parser(void) {
             backslash();
         }
         else {
-// printf("debug 10\n");
+// printf("debug 10: c=%c\n", c);
             printf("%c", c);
         }
     }
@@ -241,6 +242,7 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
     int pos = 0;
 
     indent = 0;
+    // *lastIndent = indent;
 
     while(isspace(c = getch()) && c != '\n') {
         indent += (c == '\t') ? 4 : 1;
