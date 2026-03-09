@@ -16,9 +16,10 @@ enum blockType {
 
 /* Роды блоков (вариации) */
 enum blockKind {
-    NONE_KIND,      /* для блоков без вариаций */
-    INDENTED,       /* для кода с отступами */
-    FENCED          /* для кода с ``` */
+    NONE_KIND,          /* для блоков без вариаций */
+    INDENTED,           /* для кода с отступами */
+    FENCED_BACKTICK,    /* для кода с ``` */
+    FENCED_TILDE        /* для кода с ~~~ */
 };
 
 struct tag {
