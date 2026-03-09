@@ -4,14 +4,14 @@
 #include "cmdc.h"
 
 void heading(void);
-void tabs(int *blankLines, int *lineStart);
+void tabs(int *blankLines, int *lineStart, int *lastIndent);
 void newLine(int *blankLines, int *lineStart);
 void paragraph(int *blankLines, int *lineStart);
 void printEscapedChar(int c);
 void backslash(void);
 int bufferInlineSpaces(int c, char *spaceChar, int *pos);
 void flushBufferInlineSpaces(char *spaceChar, int *pos);
-void thematicBreak(int *blankLines, int *lineStart);
+void thematicBreak(int *blankLines, int *lineStart, int lastIndent);
 
 
 void parser(void) {
@@ -28,11 +28,12 @@ void parser(void) {
     char spaceChar[100] = {0};
     int pos = 0;
 
-    int c, lineStart, blankLines;
+    int c, lineStart, blankLines, lastIndent;
     struct tag *pt;
 
     lineStart = 0;
     blankLines = 0;
+    lastIndent = 0; /*кол-во отступов высчитаное функцией tabs*/
 
     while((c = getch()) != EOF) {
         ++lineStart;
@@ -44,7 +45,7 @@ void parser(void) {
         if(lineStart == 1 && isspace(c)) {
 // printf("debug 3\n");
             ungetch(c);
-            tabs(&blankLines, &lineStart);
+            tabs(&blankLines, &lineStart, &lastIndent);
         }
         /*завершение строки*/
         else if(c == '\n') {
@@ -64,7 +65,7 @@ void parser(void) {
 
             if(c == '*' || c == '-' || c == '_') { /*тематический разрыв*/
 // printf("debug 7\n");
-                thematicBreak(&blankLines, &lineStart);
+                thematicBreak(&blankLines, &lineStart, lastIndent);
             }
             else {
 // printf("debug 8\n");
@@ -97,7 +98,7 @@ void parser(void) {
     }
 }
 
-void thematicBreak(int *blankLines, int *lineStart) {
+void thematicBreak(int *blankLines, int *lineStart, int lastIndent) {
     struct tag *pt;
     int c, initChar, count, isBreaks;
 
@@ -118,7 +119,7 @@ void thematicBreak(int *blankLines, int *lineStart) {
             fprintf(stderr, "error: many indent symbols\n");
     }
 
-    isBreaks = (count >= 3 && (c == '\n' || c == EOF));
+    isBreaks = (count >= 3 && lastIndent < 4 && (c == '\n' || c == EOF));
 
     /*вернуть все считанные символы обратно в поток*/
     ungetch(c);
@@ -144,7 +145,7 @@ void thematicBreak(int *blankLines, int *lineStart) {
         printf("\n");
 
         if(isBreaks) {
-            printf("<hr />");
+            printf("<hr />\n");
             // if(c == '\n') {
             //     *blankLines = 0;
             //     *lineStart = 0;
@@ -232,7 +233,7 @@ void newLine(int *blankLines, int *lineStart) {
     *blankLines = 0;
 }
 
-void tabs(int *blankLines, int *lineStart) {
+void tabs(int *blankLines, int *lineStart, int *lastIndent) {
     struct tag *pt;
     int indent, c;
 
@@ -248,6 +249,7 @@ void tabs(int *blankLines, int *lineStart) {
         else
             fprintf(stderr, "error: many indent symbols\n");
     }
+    *lastIndent = indent;
 
     /*это пустая строка*/
     if(c == '\n' || c == EOF) {

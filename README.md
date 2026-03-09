@@ -12,7 +12,7 @@
 - Экранирование обратной чертой (Backslash escapes) - частично
 - Символьные ссылки на сущности и числа (Entity and numeric character references) - не поддерживается
 - Блоки и линии (Blocks and inlines) - не поддерживается
-- Терминальные блоки (Leaf blocks) - не поддерживается
+- Тематические разрывы (Thematic breaks) - частично
 - Заголовки (Atx headings) - частично
 - Заголовки Setex (Setext headings ) - не поддерживается
 - Блоки кода с отступами (Indented code blocks ) - частично
