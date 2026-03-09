@@ -33,7 +33,7 @@ struct tag *peek(void) {
 
 static void printCloseTag(struct tag *self) {
     if(self->htmlTag != NULL) {
-        if(self->level > 0)
+        if(self->level > 0 && self->type == HEADING)
             printf("</%s%d>", self->htmlTag, self->level);
         else
             printf("</%s>", self->htmlTag);
