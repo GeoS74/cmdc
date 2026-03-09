@@ -121,11 +121,10 @@ void thematicBreak(int *blankLines, int *lineStart) {
     isBreaks = (count >= 3 && (c == '\n' || c == EOF));
 
     /*вернуть все считанные символы обратно в поток*/
-    if(!isBreaks) {
-        ungetch(c);
+    ungetch(c);
+    if(!isBreaks)
         while(pos > 0)
             ungetch(buf[--pos]);
-    }
 
     if((pt = peek()) != NULL) {
         if(pt->type == CODE_BLOCK && pt->kind == INDENTED) {
@@ -146,24 +145,22 @@ void thematicBreak(int *blankLines, int *lineStart) {
 
         if(isBreaks) {
             printf("<hr />");
-            if(c == '\n') {
-                *blankLines = 0;
-                *lineStart = 0;
-                printf("\n");
-                // ungetch('\n');
-            }
+            // if(c == '\n') {
+            //     *blankLines = 0;
+            //     *lineStart = 0;
+            //     printf("\n");
+            // }
         }
              
     }
     else {
         if(isBreaks) {
             printf("<hr />");
-            if(c == '\n') {
-                *blankLines = 0;
-                *lineStart = 0;
-                printf("\n");
-                ungetch('\n');
-            }
+            // if(c == '\n') {
+            //     *blankLines = 0;
+            //     *lineStart = 0;
+            //     printf("\n");
+            // }
         }
         else {
             push(getTag(PARAGRAPH));
