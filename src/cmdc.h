@@ -11,18 +11,14 @@ enum blockType {
     NONE_TYPE,
     PARAGRAPH,
     HEADING,
-    CODE_BLOCK,
-    THEMATIC_BREAK
+    CODE_BLOCK
 };
 
 /* Роды блоков (вариации) */
 enum blockKind {
     NONE_KIND,      /* для блоков без вариаций */
     INDENTED,       /* для кода с отступами */
-    FENCED,         /* для кода с ``` */
-    STAR,           /* для hr через *** */
-    DASH,           /* для hr через --- */
-    UNDERSCORE      /* для hr через ___ */
+    FENCED          /* для кода с ``` */
 };
 
 struct tag {
