@@ -146,12 +146,12 @@ void thematicBreak(int *blankLines, int *lineStart, int lastIndent) {
         printf("\n");
 
         if(isBreaks) {
-            printf("<hr />\n");
-            // if(c == '\n') {
+            printf("<hr />");
+            if(c == '\n') {
             //     *blankLines = 0;
             //     *lineStart = 0;
-            //     printf("\n");
-            // }
+                printf("\n");
+            }
         }
              
     }
