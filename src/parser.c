@@ -12,8 +12,9 @@ void backslash(void);
 int bufferInlineSpaces(int c, char *spaceChar, int *pos);
 void flushBufferInlineSpaces(char *spaceChar, int *pos);
 void thematicBreak(int *blankLines, int *lineStart, int lastIndent);
+void popAndClose(int *blankLines, int *lineStart);
 
-int isFencedBlock(void);
+int isCodeBlockFenced(void);
 void codeBlockInline(int *blankLines, int *lineStart);
 void codeBlockFenced(void);
 
@@ -69,7 +70,7 @@ void parser(void) {
 
             if(c == '`' || c == '~')
                 // codeBlock(&blankLines, &lineStart);
-                if(isFencedBlock())
+                if(isCodeBlockFenced())
                     codeBlockFenced();
                 else
                     paragraph(&blankLines, &lineStart);
@@ -102,7 +103,6 @@ void parser(void) {
         }
     }
 }
-
 
 
 // void flushBufferCodeBlockInline() {
@@ -181,7 +181,6 @@ void printCodeBlockInline(char *buf, int max) {
     - EOF
 */
 void codeBlockInline(int *blankLines, int *lineStart){
-    struct tag *pt;
     int c, s;
     
     char buf[500];
@@ -197,22 +196,14 @@ void codeBlockInline(int *blankLines, int *lineStart){
             /*инлайн код в заголовке, читать до первого переноса строки*/
             if(peek()->type == HEADING) {
                 printCodeBlockInline(buf, pos);
-
-                pt = pop();
-                pt->close(pt);
-                *blankLines = 0;
-                *lineStart = 0;
+                popAndClose(blankLines, lineStart);
                 printf("\n");
                 return;
             }
             /*пустая строка, конец inline блока*/
             else if(!s) {
                 printCodeBlockInline(buf, pos);
-
-                pt = pop();
-                pt->close(pt);
-                *blankLines = 0;
-                *lineStart = 0;
+                popAndClose(blankLines, lineStart);
                 printf("\n");
                 return;
             }
@@ -225,16 +216,12 @@ void codeBlockInline(int *blankLines, int *lineStart){
             /*в начале могут быть отступы И символ открытия кодового блока*/
             /*возможно это начало fenced блока кода*/
             else if(!s && (c == '`' || c == '~')) {
-                ungetch(c); // вернут в поток перед isFencedBlock
-                if(isFencedBlock()) {
+                ungetch(c); // вернут в поток перед isCodeBlockFenced
+                if(isCodeBlockFenced()) {
                     /*это fenced блок, конец inline блока*/
                     --pos;
                     printCodeBlockInline(buf, pos);
-                    
-                    pt = pop();
-                    pt->close(pt);
-                    *blankLines = 0;
-                    *lineStart = 0;
+                    popAndClose(blankLines, lineStart);
                     printf("\n");
                     return;
                 }
@@ -254,7 +241,7 @@ void codeBlockInline(int *blankLines, int *lineStart){
 возвращает 0 или 1
 все считанные символы возвращает в поток
 */
-int isFencedBlock(void) {
+int isCodeBlockFenced(void) {
     int c, initChar;
 
     char buf[500];
@@ -370,17 +357,11 @@ void thematicBreak(int *blankLines, int *lineStart, int lastIndent) {
 
     if((pt = peek()) != NULL) {
         if(pt->type == CODE_BLOCK && pt->kind == INDENTED) {
-            pt = pop();
-            pt->close(pt);
-            *blankLines = 0;
-            *lineStart = 0;
+            popAndClose(blankLines, lineStart);
         }
         else if(pt->type == PARAGRAPH) {
             if(*blankLines > 0 || isBreaks) {
-                pt = pop();
-                pt->close(pt);
-                *blankLines = 0;
-                *lineStart = 0;
+                popAndClose(blankLines, lineStart);
             }
         }
         printf("\n");
@@ -416,17 +397,11 @@ void paragraph(int *blankLines, int *lineStart) {
 
     if((pt = peek()) != NULL) {
         if(pt->type == CODE_BLOCK && pt->kind == INDENTED) {
-            pt = pop();
-            pt->close(pt);
-            *blankLines = 0;
-            *lineStart = 0;
+            popAndClose(blankLines, lineStart);
         }
         else if(pt->type == PARAGRAPH) {
             if(*blankLines > 0) {
-                pt = pop();
-                pt->close(pt);
-                *blankLines = 0;
-                *lineStart = 0;
+                popAndClose(blankLines, lineStart);
             }
         }
         printf("\n");
@@ -505,11 +480,9 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
     if((pt = peek()) != NULL) {
         if(pt->type == CODE_BLOCK && pt->kind == INDENTED) {
             if(indent < TAB_STEP) {
-                pt = pop();
-                pt->close(pt);
+                popAndClose(blankLines, lineStart);
                 printf("\n");
                 indent = 0;
-                *blankLines = 0;
             }
             else {
                 /*вывести пустые строки внутри блока кода*/
@@ -637,7 +610,7 @@ void printEscapedChar(int c) {
 }
 
 /*
-буферезирует пробелы между символами и в коне строки
+буферезирует пробелы между символами и в конце строки
 возврат:
     1 - символ был пробелом и обработан (нужен continue)
     0 - символ требует дальнейшей обработки
@@ -683,4 +656,14 @@ void flushBufferInlineSpaces(char *spaceChar, int *pos) {
     for(int i = 0; i < *pos; ++i)
         printf("%c", spaceChar[i]);
     *pos = 0;
+}
+
+/*закрывает блок и сбрасывает отступ с пустыми строками*/
+void popAndClose(int *blankLines, int *lineStart) {
+    struct tag *pt = pop();
+    if(pt) {
+        pt->close(pt);
+    }
+    *blankLines = 0;
+    *lineStart = 0;
 }
