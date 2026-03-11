@@ -170,11 +170,96 @@ void printCodeBlockInline(char *buf, int max) {
     //     printf("%c", buf[i]);
 }
 
+/*
+Ищет пару для открывающей последовательности inline кодового блока.
+Прерывает поиск если:
+    - Пустая строка
+    - Начало fenced-блока
+    - Конец заголовка (перевод строки)
+    - EOF
+*/
+int isCodeBlockInline(void) {
+    struct tag t;
+    int c, initChar, s, match;
+
+    char buf[500];
+    int pos = 0;
+
+    initChar = getch();
+    buf[pos++] = initChar;
+
+    /*создать открывающий тег*/
+    t = getTag(CODE_INLINE);
+    t.level = 1;
+
+    while((c = getch()) == initChar) {
+        if(pos < 500) {
+            buf[pos++] = c;
+            t.level++;
+        }
+        else fprintf(stderr, "error: many indent symbols\n");
+    }
+    ungetch(c);
+
+    s = 0, match = 0;
+    while((c = getch()) != EOF) {
+        if(pos < 500)
+            buf[pos++] = c;
+        else fprintf(stderr, "error: many indent symbols\n");
+
+        if(c == initChar) {
+            int l = 1;
+            while((c = getch()) == initChar) {
+                if(pos < 500)
+                    buf[pos++] = c;
+                else fprintf(stderr, "error: many indent symbols\n");
+                ++l;
+            }
+            if(l == t.level) {
+                match = 1;
+                break;
+            }
+        }
+
+        if (c == '\n') {
+            /*пустая строка, конец inline блока*/
+            if(!s) {
+                match = 0;
+                break;
+            }
+            s = 0;
+        }
+        else {
+            if(!s && (c == ' ' || c == '\t')) {
+                continue;
+            }
+            /*в начале могут быть отступы И символ открытия кодового блока*/
+            /*возможно это начало fenced блока кода*/
+            else if(!s && (c == '`' || c == '~')) {
+                ungetch(c); // вернут в поток перед isCodeBlockFenced
+                if(isCodeBlockFenced()) {
+                    /*это fenced блок, конец inline блока*/
+                    match = 0;
+                    break;
+                }
+                getch(); // вывести символ из потока
+            }
+            ++s;
+        }
+    }
+    ungetch(c);
+
+    /*возврат символов в поток*/
+    while(pos > 0)
+        ungetch(buf[--pos]);
+    
+    return match;
+}
 
 /*
 всегда вызывается внутри какого-то блока
 
-Прерывает буферизаццию если:
+Прерывает буферизацию если:
     - Пустая строка
     - Начало fenced-блока
     - Конец заголовка (перевод строки)
@@ -253,8 +338,7 @@ int isCodeBlockFenced(void) {
     while((c = getch()) == initChar) {
         if(pos < 500)
             buf[pos++] = c;
-        else
-            fprintf(stderr, "error: many indent symbols\n");
+        else fprintf(stderr, "error: many indent symbols\n");
     }
     ungetch(c);
 
@@ -271,8 +355,7 @@ int isCodeBlockFenced(void) {
 
         if(pos < 500)
             buf[pos++] = c;
-        else
-            fprintf(stderr, "error: many indent symbols\n");
+        else fprintf(stderr, "error: many indent symbols\n");
     }
     ungetch(c);
 
