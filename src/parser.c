@@ -14,9 +14,11 @@ void flushBufferInlineSpaces(char *spaceChar, int *pos);
 void thematicBreak(int *blankLines, int *lineStart, int lastIndent);
 void popAndClose(int *blankLines, int *lineStart);
 
+int isCodeBlockInline(void);
 int isCodeBlockFenced(void);
-void codeBlockInline(int *blankLines, int *lineStart);
+void codeBlockInline(void);
 void codeBlockFenced(void);
+void printBackTicks(void);
 
 void parser(void) {
     /*
@@ -62,7 +64,10 @@ void parser(void) {
         }
         else if(peek() != NULL && peek()->type == PARAGRAPH && c == '`') {
             ungetch(c);
-            codeBlockInline(&blankLines, &lineStart);
+            if(isCodeBlockInline())
+                codeBlockInline();
+            else 
+             printBackTicks();
         }
         /*любой не пробельный символ в начале строки*/
         else if(lineStart == 1) {
@@ -207,6 +212,7 @@ int isCodeBlockInline(void) {
             buf[pos++] = c;
         else fprintf(stderr, "error: many indent symbols\n");
 
+        /*поиск пары*/
         if(c == initChar) {
             int l = 1;
             while((c = getch()) == initChar) {
@@ -222,8 +228,13 @@ int isCodeBlockInline(void) {
         }
 
         if (c == '\n') {
+            /*инлайн код в заголовке, читать до первого переноса строки*/
+            if(peek()->type == HEADING) {
+                match = 0;
+                break;
+            }
             /*пустая строка, конец inline блока*/
-            if(!s) {
+            else if(!s) {
                 match = 0;
                 break;
             }
@@ -256,6 +267,56 @@ int isCodeBlockInline(void) {
     return match;
 }
 
+/*применять эту функцию только в паре с isCodeBlockInline*/
+void codeBlockInline(void) {
+    struct tag t;
+    int c, initChar;
+
+    /*создать открывающий тег*/
+    t = getTag(CODE_INLINE);
+    t.level = 1;
+    initChar = getch();
+
+    while((c = getch()) == initChar)
+        t.level++;
+    ungetch(c);
+
+    printf("<code>");
+
+    while((c = getch()) != EOF) {
+        /*поиск пары*/
+        if(c == initChar) {
+            int l = 1;
+            while((c = getch()) == initChar)
+                ++l;
+
+            if(l == t.level) {
+                printf("</code>");
+                ungetch(c);
+                return; /*должнен обязательно сработать*/
+            }
+            else {
+                while(l-- > 0)
+                    printf("%c", initChar);
+                printf("%c", c);
+            }
+        }
+        else if(c == '\n')
+            printf(" ");
+        else
+            printf("%c", c);
+    }
+    fprintf(stderr, "error: codeBlockInline\n");
+}
+
+void printBackTicks(void) {
+    int c;
+
+     while((c = getch()) == '`')
+        printf("%c", c);
+    ungetch(c);
+}
+
 /*
 всегда вызывается внутри какого-то блока
 
@@ -265,7 +326,7 @@ int isCodeBlockInline(void) {
     - Конец заголовка (перевод строки)
     - EOF
 */
-void codeBlockInline(int *blankLines, int *lineStart){
+void __codeBlockInline(int *blankLines, int *lineStart){
     int c, s;
     
     char buf[500];
