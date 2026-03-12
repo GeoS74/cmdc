@@ -67,14 +67,13 @@ void parser(void) {
             if(isCodeBlockInline())
                 codeBlockInline();
             else 
-             printBackTicks();
+                printBackTicks();
         }
         /*любой не пробельный символ в начале строки*/
         else if(lineStart == 1) {
             ungetch(c);
 
             if(c == '`' || c == '~')
-                // codeBlock(&blankLines, &lineStart);
                 if(isCodeBlockFenced())
                     codeBlockFenced();
                 else
@@ -109,71 +108,6 @@ void parser(void) {
     }
 }
 
-
-// void flushBufferCodeBlockInline() {
-
-// }
-
-/*
-*/
-void printCodeBlockInline(char *buf, int max) {
-    // printf("\n~~~~buf~~~\n");
-    // for(int i = 0; i < max; ++i)
-    //     printf("%c", buf[i]);
-    // printf("\n~~~~~~~~\n");
-    // return;
-
-    struct tag t;
-    int i, f, start;
-
-    start = 0;
-    i = 0;
-
-    /*выводить символы до первого `*/
-    for(; buf[i] != '`' && i < max; ++i)
-        printf("%c", buf[i]);
-    
-    start = i;
-    
-    /*буфер пустой, завершить обработку*/
-    if(i == max) 
-        return;
-
-    /*создать открывающий тег*/
-    t = getTag(CODE_INLINE);
-    for(; buf[i] == '`'; ++i)
-        t.level++;
-    
-    /*найти закрывающий тег*/
-    for(f = 0; i < max; ++i) {
-        if(buf[i] == '`') {
-            ++f;
-            continue;
-        }
-
-        if(f == t.level) {
-            printf("<code>");
-            for(int w = start + f; w < i - f; ++w)
-                printf("%c", buf[w]);
-            t.close(&t);
-            printCodeBlockInline(buf + i, max - i);
-            f = 0;
-            break;
-        }
-        f = 0;
-    }
-
-    if(f && f == t.level) {
-        printf("<code>");
-        for(int w = start + f; w < i - f; ++w)
-            printf("%c", buf[w]);
-        t.close(&t);
-        // printf("para f = %d i = %d max = %d\n", f, i, max);
-    }
-    
-    // for(int i = 0; i < pos; ++i)
-    //     printf("%c", buf[i]);
-}
 
 /*
 Ищет пару для открывающей последовательности inline кодового блока.
@@ -225,6 +159,11 @@ int isCodeBlockInline(void) {
                 match = 1;
                 break;
             }
+            else {
+                ungetch(c);
+                ++s; /*увеличить счётчик, т.к. была проверка на закрывающий тег*/
+                continue;
+            }
         }
 
         if (c == '\n') {
@@ -263,7 +202,7 @@ int isCodeBlockInline(void) {
     /*возврат символов в поток*/
     while(pos > 0)
         ungetch(buf[--pos]);
-    
+
     return match;
 }
 
@@ -281,104 +220,69 @@ void codeBlockInline(void) {
         t.level++;
     ungetch(c);
 
-    printf("<code>");
-
-    while((c = getch()) != EOF) {
-        /*поиск пары*/
-        if(c == initChar) {
-            int l = 1;
-            while((c = getch()) == initChar)
-                ++l;
-
-            if(l == t.level) {
-                printf("</code>");
-                ungetch(c);
-                return; /*должнен обязательно сработать*/
-            }
-            else {
-                while(l-- > 0)
-                    printf("%c", initChar);
-                printf("%c", c);
-            }
-        }
-        else if(c == '\n')
-            printf(" ");
-        else
-            printf("%c", c);
-    }
-    fprintf(stderr, "error: codeBlockInline\n");
-}
-
-void printBackTicks(void) {
-    int c;
-
-     while((c = getch()) == '`')
-        printf("%c", c);
-    ungetch(c);
-}
-
-/*
-всегда вызывается внутри какого-то блока
-
-Прерывает буферизацию если:
-    - Пустая строка
-    - Начало fenced-блока
-    - Конец заголовка (перевод строки)
-    - EOF
-*/
-void __codeBlockInline(int *blankLines, int *lineStart){
-    int c, s;
-    
+    /*записать все символы в буфер*/
     char buf[500];
     int pos = 0;
 
-    s = 0;
     while((c = getch()) != EOF) {
         if(pos < 500) 
             buf[pos++] = c;
         else fprintf(stderr, "error: many indent symbols\n");
 
-        if (c == '\n') {
-            /*инлайн код в заголовке, читать до первого переноса строки*/
-            if(peek()->type == HEADING) {
-                printCodeBlockInline(buf, pos);
-                popAndClose(blankLines, lineStart);
-                printf("\n");
-                return;
+        /*поиск пары*/
+        if(c == initChar) {
+            int l = 1;
+            while((c = getch()) == initChar) {
+                ++l;
+                if(pos < 500) 
+                    buf[pos++] = c;
+                else fprintf(stderr, "error: many indent symbols\n");
             }
-            /*пустая строка, конец inline блока*/
-            else if(!s) {
-                printCodeBlockInline(buf, pos);
-                popAndClose(blankLines, lineStart);
-                printf("\n");
-                return;
+            ungetch(c);
+                 
+            if(l == t.level) {
+                pos -= t.level;
+                break; /*должен обязательно сработать*/
             }
-            s = 0;
-        }
-        else {
-            if(!s && (c == ' ' || c == '\t')) {
-                continue;
-            }
-            /*в начале могут быть отступы И символ открытия кодового блока*/
-            /*возможно это начало fenced блока кода*/
-            else if(!s && (c == '`' || c == '~')) {
-                ungetch(c); // вернут в поток перед isCodeBlockFenced
-                if(isCodeBlockFenced()) {
-                    /*это fenced блок, конец inline блока*/
-                    --pos;
-                    printCodeBlockInline(buf, pos);
-                    popAndClose(blankLines, lineStart);
-                    printf("\n");
-                    return;
-                }
-                getch(); // вывести символ из потока
-            }
-            ++s;
         }
     }
-    ungetch(c); // вернуть EOF в поток
-    printCodeBlockInline(buf, pos);
-    return;
+
+    /*поиск пробелов по краям*/
+    if(buf[0] == ' ' && (buf[pos - 1] == ' ' || buf[pos - 1] == '\n')) {
+        // сдвигаем начало на 1 символ
+        for(int i = 0; i < pos - 1; i++)
+            buf[i] = buf[i + 1];
+        pos -= 2;  // убираем два пробела
+    }
+
+    /*печать блока*/
+    printf("<code>");
+    int nl = 0;
+    for(int i = 0; i < pos; ++i) {
+        if(buf[i] == '\n') {
+            ++nl;
+            continue;
+        }
+        
+        if(nl && isspace(buf[i]))
+            continue;
+
+        /*если был символ переноса и печатаем символ не пробел, то вывести пробел*/
+        if(nl)
+            printf(" ");
+        
+        nl = 0;
+        printf("%c", buf[i]);
+             
+    }
+    printf("</code>");
+}
+
+void printBackTicks(void) {
+    int c;
+    while((c = getch()) == '`')
+        printf("%c", c);
+    ungetch(c);
 }
 
 /*
@@ -426,32 +330,6 @@ int isCodeBlockFenced(void) {
 
     return c == initChar ? 0 : 1;
 }
-
-
-// void codeBlock(int *blankLines, int *lineStart) {
-//     int c, initChar, count;
-//     enum blockType type;
-
-//     initChar = getch();
-//     count = 1;
-
-//     while((c = getch()) == initChar)
-//         if(c == initChar) 
-//             ++count;
-
-//     ungetch(c);
-
-//     /*определить тип кодового блока и передать управление*/
-//     if(count < 3) {
-//         while(count-- > 0)
-//             ungetch(initChar);
-//         paragraph(blankLines, lineStart);
-//     }
-//     else {
-//         type = initChar == '`' ? FENCED_BACKTICK : FENCED_TILDE;
-//         codeBlockFenced(type, count);
-//     }
-// }
 
 void codeBlockFenced(){
     printf("codeBlockFenced\n");
