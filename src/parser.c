@@ -64,7 +64,10 @@ void parser(void) {
         }
         else if(peek() != NULL && peek()->type == PARAGRAPH && c == '`') {
             ungetch(c);
-            if(isCodeBlockInline())
+
+            if(blankLines > 0)
+                paragraph(&blankLines, &lineStart);
+            else if(isCodeBlockInline())
                 codeBlockInline();
             else 
                 printBackTicks();
@@ -140,7 +143,7 @@ int isCodeBlockInline(void) {
     }
     ungetch(c);
 
-    s = 0, match = 0;
+    s = 1, match = 0;
     while((c = getch()) != EOF) {
         if(pos < 500)
             buf[pos++] = c;
