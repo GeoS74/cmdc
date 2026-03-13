@@ -211,7 +211,7 @@ int isCodeBlockInline(void) {
 /*применять эту функцию только в паре с isCodeBlockInline*/
 void codeBlockInline(void) {
     struct tag t;
-    int c, initChar;
+    int c, initChar, emptyString;
 
     /*создать открывающий тег*/
     t = getTag(CODE_INLINE);
@@ -226,6 +226,7 @@ void codeBlockInline(void) {
     char buf[500];
     int pos = 0;
 
+    emptyString = 1; /*флаг пустой строки*/
     while((c = getch()) != EOF) {
         if(pos < 500) 
             buf[pos++] = c;
@@ -246,11 +247,16 @@ void codeBlockInline(void) {
                 pos -= t.level;
                 break; /*должен обязательно сработать*/
             }
+
+            emptyString = 0;
         }
+
+        if(!isspace(c))
+            emptyString = 0;
     }
 
     /*поиск пробелов по краям*/
-    if(pos > 1 && buf[0] == ' ' && (buf[pos - 1] == ' ' || buf[pos - 1] == '\n')) {
+    if(!emptyString && (buf[0] == ' ' || buf[0] == '\n') && (buf[pos - 1] == ' ' || buf[pos - 1] == '\n')) {
         // сдвигаем начало на 1 символ
         for(int i = 0; i < pos - 1; i++)
             buf[i] = buf[i + 1];
@@ -270,7 +276,7 @@ void codeBlockInline(void) {
             continue;
 
         /*если был символ переноса и печатаем символ не пробел, то вывести пробел*/
-        if(nl && i != 1)
+        if(nl && !isspace(buf[i]))
             printf(" ");
         
         nl = 0;
