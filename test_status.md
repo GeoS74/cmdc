@@ -597,6 +597,62 @@
     ```
     <p>[not·a·<code>link](/foo</code>)</p>
     ```
+- [x] Example 343:
+    ```
+    `<a href="`">`
+    ```
+    ->
+    ```
+    <p><code>&lt;a href=&quot;</code>&quot;&gt;`</p>
+    ```
+- [ ] Example 344:
+    ```
+    <a href="`">`
+    ```
+    ->
+    ```
+    <p><a href="`">`</p>
+    ```
+- [x] Example 345:
+    ```
+    `<https://foo.bar.`baz>`
+    ```
+    ->
+    ```
+    <p><code>&lt;https://foo.bar.</code>baz&gt;`</p>
+    ```
+- [ ] Example 346:
+    ```
+    <https://foo.bar.`baz>`
+    ```
+    ->
+    ```
+    <p><a href="https://foo.bar.%60baz">https://foo.bar.`baz</a>`</p>
+    ```
+- [x] Example 347:
+    ```
+    ```foo``
+    ```
+    ->
+    ```
+    <p>```foo``</p>
+    ```
+- [x] Example 348:
+    ```
+    `foo
+    ```
+    ->
+    ```
+    <p>`foo</p>
+    ```
+- [x] Example 349:
+    ```
+    `foo``bar``
+    ```
+    ->
+    ```
+    <p>`foo<code>bar</code></p>
+    ```
 
 ### Hard line breaks
 - [x] Example 633:
