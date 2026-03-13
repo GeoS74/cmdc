@@ -517,7 +517,17 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
             /*отступы внутри кодового блока должны быть выведены*/
         }
         else if(pt->type == PARAGRAPH) {
-            indent = 0;
+            if(*blankLines > 0) {
+                popAndClose(blankLines, lineStart); /*сбросит lineStart*/
+                *lineStart = indent;                /*есть отсупы, lineStart не равен 0*/
+                printf("\n");
+                struct tag t = getTag(CODE_BLOCK);
+                t.kind = INDENTED;
+                push(t);
+                printf("<pre><code>");
+            }
+            else
+                indent = 0;
         }
     }
     /*вне блока*/

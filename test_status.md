@@ -476,7 +476,22 @@
     ```
     <p><code>foo</code></p>
     ```
-
+- [x] Example 329:
+    ```
+    ``·foo·`·bar·``
+    ```
+    ->
+    ```
+    <p><code>foo·`·bar</code></p>
+    ```
+- [x] Example 330:
+    ```
+    `·``·`
+    ```
+    ->
+    ```
+    <p><code>``</code></p>
+    ```
 
 
 ### Hard line breaks
