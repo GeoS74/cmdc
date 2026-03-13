@@ -589,6 +589,14 @@
     ```
     <p>*foo<code>*</code></p>
     ```
+- [x] Example 342:
+    ```
+    [not·a·`link](/foo`)
+    ```
+    ->
+    ```
+    <p>[not·a·<code>link](/foo</code>)</p>
+    ```
 
 ### Hard line breaks
 - [x] Example 633:
