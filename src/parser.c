@@ -62,16 +62,6 @@ void parser(void) {
             ungetch(c);
             heading();
         }
-        else if(peek() != NULL && peek()->type == PARAGRAPH && c == '`') {
-            ungetch(c);
-
-            if(blankLines > 0)
-                paragraph(&blankLines, &lineStart);
-            else if(isCodeBlockInline())
-                codeBlockInline();
-            else 
-                printBackTicks();
-        }
         /*любой не пробельный символ в начале строки*/
         else if(lineStart == 1) {
             ungetch(c);
@@ -91,6 +81,15 @@ void parser(void) {
         /*экранирование*/
         else if(c == '\\') {
             backslash();
+        }
+        /*инлайн блок кода*/
+        else if(peek() != NULL && peek()->type == PARAGRAPH && c == '`') {
+            ungetch(c);
+
+            if(isCodeBlockInline())
+                codeBlockInline();
+            else 
+                printBackTicks();
         }
         else {
             printf("%c", c);
@@ -251,7 +250,7 @@ void codeBlockInline(void) {
     }
 
     /*поиск пробелов по краям*/
-    if(buf[0] == ' ' && (buf[pos - 1] == ' ' || buf[pos - 1] == '\n')) {
+    if(pos > 1 && buf[0] == ' ' && (buf[pos - 1] == ' ' || buf[pos - 1] == '\n')) {
         // сдвигаем начало на 1 символ
         for(int i = 0; i < pos - 1; i++)
             buf[i] = buf[i + 1];

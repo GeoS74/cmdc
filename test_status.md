@@ -459,6 +459,26 @@
     <p>aaa</p>
     <h1>aaa</h1>
     ```
+### Code spans
+- [x] Example 327:
+    ```
+    `hi`lo`
+    ```
+    ->
+    ```
+    <p><code>hi</code>lo`</p>
+    ```
+- [x] Example 328:
+    ```
+    `foo`
+    ```
+    ->
+    ```
+    <p><code>foo</code></p>
+    ```
+
+
+
 ### Hard line breaks
 - [x] Example 633:
     ```
