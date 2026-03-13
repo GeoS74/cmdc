@@ -43,5 +43,7 @@ struct tag *peek(void);
 
 /*печатает экранируемый символ*/
 void printEscapedChar(int c);
+/*печатает html сущности*/
+void printHTMLEntities(int c);
 
 #endif

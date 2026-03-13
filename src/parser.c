@@ -92,7 +92,8 @@ void parser(void) {
                 printBackTicks();
         }
         else {
-            printf("%c", c);
+            printHTMLEntities(c);
+            // printf("%c", c);
         }
     }
 
@@ -280,7 +281,7 @@ void codeBlockInline(void) {
             printf(" ");
         
         nl = 0;
-        printf("%c", buf[i]);
+        printHTMLEntities(buf[i]);
              
     }
     printf("</code>");
@@ -646,6 +647,16 @@ void printEscapedChar(int c) {
         case '>': printf("&gt;"); break;
         case '"': printf("&quot;"); break;
         default: printf("\\%c", c); break;
+    }
+}
+
+void printHTMLEntities(int c) {
+    switch(c) {
+        case '&': printf("&amp;"); break;
+        case '<': printf("&lt;"); break;
+        case '>': printf("&gt;"); break;
+        case '"': printf("&quot;"); break;
+        default: printf("%c", c); break;
     }
 }
 
