@@ -270,7 +270,7 @@ void codeBlockInline(void) {
             continue;
 
         /*если был символ переноса и печатаем символ не пробел, то вывести пробел*/
-        if(nl)
+        if(nl && i != 1)
             printf(" ");
         
         nl = 0;
