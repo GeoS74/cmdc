@@ -254,7 +254,11 @@
     ```
 - [x] Example 69: `····#·foo` -> 
     ```
-    <pre><code># foo
+    ····#·foo
+    ```
+    ->
+    ```
+    <pre><code>#·foo
     </code></pre>
     ```
 - [x] Example 70:
@@ -267,7 +271,91 @@
     <p>foo
     #·bar</p>
     ```
+- [x] Example 71:
+    ```
+    ##·foo·##
+    ··###···bar····###
+    ```
+    ->
+    ```
+    <h2>foo</h2>
+    <h3>bar</h3>
+    ```
+- [x] Example 72:
+    ```
+    #·foo·##################################
+    #####·foo·##
+    ```
+    ->
+    ```
+    <h1>foo</h1>
+    <h5>foo</h5>
+    ```
+- [x] Example 73:
+    ```
+    ###·foo·###·····
+    ```
+    ->
+    ```
+    <h3>foo</h3>
+    ```
+- [x] Example 74:
+    ```
+    ###·foo·###·b
+    ```
+    ->
+    ```
+    <h3>foo·###·b</h3>
+    ```
 - [x] Example 75: `#·foo#` -> `<h1>foo#</h1>`
+- [x] Example 76:
+    ```
+    ###·foo·\###
+    ##·foo·#\##
+    #·foo·\#
+    ```
+    ->
+    ```
+    <h3>foo·###</h3>
+    <h2>foo·###</h2>
+    <h1>foo·#</h1>
+    ```
+- [x] Example 77:
+    ```
+    ****
+    ##·foo
+    ****
+    ```
+    ->
+    ```
+    <hr />
+    <h2>foo</h2>
+    <hr />
+    ```
+- [x] Example 78:
+    ```
+    Foo·bar
+    #·baz
+    Bar·foo
+    ```
+    ->
+    ```
+    <p>Foo·bar</p>
+    <h1>baz</h1>
+    <p>Bar·foo</p>
+    ```
+- [x] Example 79:
+    ```
+    ##·
+    #
+    ###·###
+    ```
+    ->
+    ```
+    <h2></h2>
+    <h1></h1>
+    <h3></h3>
+    ```
 ### Indented code blocks
 - [x] Example 107:
     ```

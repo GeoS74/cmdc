@@ -64,10 +64,14 @@ void parser(void) {
             ungetch(c);
             heading();
         }
-        // else if(prevch() == ' ' && c == '#' && peek() != NULL && peek()->type == HEADING) {
-        //     ungetch(c);
-        //     headingTrailingHashes();
-        // }
+        else if(c == '#' && lineStart == 1 && peek() != NULL && peek()->type == PARAGRAPH) {
+            ungetch(c);
+
+            if(lastIndent < 4)
+                popAndClose(&blankLines, &lineStart);
+
+            printf("\n");
+        }
         /*любой не пробельный символ в начале строки*/
         else if(lineStart == 1) {
             ungetch(c);
