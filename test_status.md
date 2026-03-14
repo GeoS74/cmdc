@@ -75,14 +75,13 @@
     <p>foo<br />
     bar</p>
     ```
-- [ ] Example 17: 
+- [x] Example 17: 
     ```
-    `` \[\` ``
+    ``·\[\`·``
     ``` 
     -> 
     ```
-    <pre><code>\[\]
-    </code></pre>
+    <p><code>\[\`</code></p>
     ```
 - [x] Example 18: `····\[\]` -> 
     ```
