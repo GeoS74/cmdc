@@ -35,11 +35,12 @@ void parser(void) {
     int pos = 0;
 
     int c, lineStart, blankLines, lastIndent;
+    int lastChar; // последний символ выведенный основным циклом
     struct tag *pt;
 
     lineStart = 0;
     blankLines = 0;
-    lastIndent = 0; /*кол-во отступов высчитаное функцией tabs*/
+    lastIndent = 0; /*кол-во отступов высчитаное функцией tabs, используется в thematicBreak*/
 
     while((c = getch()) != EOF) {
         ++lineStart;
@@ -62,6 +63,10 @@ void parser(void) {
             ungetch(c);
             heading();
         }
+        // else if(c == '#' && peek() != NULL && peek()->type == HEADING) {
+            // ungetch(c);
+            // stripTrailingHashes
+        // }
         /*любой не пробельный символ в начале строки*/
         else if(lineStart == 1) {
             ungetch(c);
@@ -83,7 +88,7 @@ void parser(void) {
             backslash();
         }
         /*инлайн блок кода*/
-        else if(peek() != NULL && peek()->type == PARAGRAPH && c == '`') {
+        else if(c == '`' && peek() != NULL && peek()->type == PARAGRAPH) {
             ungetch(c);
 
             if(isCodeBlockInline())
