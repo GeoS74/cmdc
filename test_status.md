@@ -257,6 +257,16 @@
     <pre><code># foo
     </code></pre>
     ```
+- [x] Example 70:
+    ```
+    foo
+    ····#·bar
+    ```
+    ->
+    ```
+    <p>foo
+    #·bar</p>
+    ```
 - [x] Example 75: `#·foo#` -> `<h1>foo#</h1>`
 ### Indented code blocks
 - [x] Example 107:

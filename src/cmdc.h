@@ -7,6 +7,7 @@ void parser(void);
 
 int getch(void);
 void ungetch(int c);
+int prevch(void);
 
 /* Типы блоков */
 enum blockType {

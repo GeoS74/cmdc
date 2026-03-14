@@ -4,6 +4,8 @@
 #include "cmdc.h"
 
 void heading(void);
+void headingTrailingHashes(void);
+
 void tabs(int *blankLines, int *lineStart, int *lastIndent);
 void newLine(int *blankLines, int *lineStart);
 void paragraph(int *blankLines, int *lineStart);
@@ -35,7 +37,6 @@ void parser(void) {
     int pos = 0;
 
     int c, lineStart, blankLines, lastIndent;
-    int lastChar; // последний символ выведенный основным циклом
     struct tag *pt;
 
     lineStart = 0;
@@ -63,10 +64,10 @@ void parser(void) {
             ungetch(c);
             heading();
         }
-        // else if(c == '#' && peek() != NULL && peek()->type == HEADING) {
-            // ungetch(c);
-            // stripTrailingHashes
-        // }
+        else if(prevch() == ' ' && c == '#' && peek() != NULL && peek()->type == HEADING) {
+            ungetch(c);
+            headingTrailingHashes();
+        }
         /*любой не пробельный символ в начале строки*/
         else if(lineStart == 1) {
             ungetch(c);
@@ -600,6 +601,34 @@ void heading(void) {
     }
 }
 
+void headingTrailingHashes(void) {
+    int c;
+    
+    char buf[500];
+    int pos = 0;
+
+    while((c = getch()) == '#') {
+        if(pos < 500)
+            buf[pos++] = c;
+        else fprintf(stderr, "error: many indent symbols\n");
+    }
+    ungetch(c);
+
+    while((c = getch()) == ' ' || c == '\t') {
+        if(pos < 500)
+            buf[pos++] = c;
+        else fprintf(stderr, "error: many indent symbols\n");
+    }
+
+    if(c != '\n' && c != EOF) {
+        /*вывод буфера*/
+        for(int i = 0; i < pos; ++i)
+            printf("%c", buf[i]);
+    }
+    
+    ungetch(c);
+}
+
 void backslash(void) {
     struct tag *pt;
     int c;
@@ -682,6 +711,11 @@ int bufferInlineSpaces(int c, char *spaceChar, int *pos) {
         if(c == ' ' || c == '\t') {
             spaceChar[(*pos)++] = c;
             return 1;
+        }
+        else if(c == '#' && peek() != NULL && peek()->type == HEADING) {
+            /*внутри заголовка в конце отбрасываются # вместе с пробелами*/
+            ungetch(c);
+            return 0;
         }
         else if(c == '\n') {
             if((pt = peek()) != NULL) {
