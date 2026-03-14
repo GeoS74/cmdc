@@ -53,6 +53,7 @@
     </code></pre>
     ```
 - [x] Example 10: `#→Foo` -> `<h1>Foo</h1>`
+- [x] Example 11: `*→*→*→` -> `<hr />`
 ### Backslash escapes
 - [x] Example 12:
     ```

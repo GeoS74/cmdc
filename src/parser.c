@@ -368,7 +368,7 @@ void thematicBreak(int *blankLines, int *lineStart, int lastIndent) {
     buf[pos++] = initChar;
     count = 1;
 
-    while((c = getch()) == initChar || c == ' ') {
+    while((c = getch()) == initChar || c == ' ' || c == '\t') {
         if(c == initChar) 
             ++count;
 
