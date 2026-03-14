@@ -4,7 +4,7 @@
 #include "cmdc.h"
 
 void heading(void);
-void headingTrailingHashes(void);
+void headingTrailingHashes(char *spaceChar, int *pos);
 
 void tabs(int *blankLines, int *lineStart, int *lastIndent);
 void newLine(int *blankLines, int *lineStart);
@@ -64,10 +64,10 @@ void parser(void) {
             ungetch(c);
             heading();
         }
-        else if(prevch() == ' ' && c == '#' && peek() != NULL && peek()->type == HEADING) {
-            ungetch(c);
-            headingTrailingHashes();
-        }
+        // else if(prevch() == ' ' && c == '#' && peek() != NULL && peek()->type == HEADING) {
+        //     ungetch(c);
+        //     headingTrailingHashes();
+        // }
         /*любой не пробельный символ в начале строки*/
         else if(lineStart == 1) {
             ungetch(c);
@@ -601,32 +601,35 @@ void heading(void) {
     }
 }
 
-void headingTrailingHashes(void) {
+void headingTrailingHashes(char *spaceChar, int *pos) {
     int c;
     
     char buf[500];
-    int pos = 0;
+    int p = 0;
 
     while((c = getch()) == '#') {
-        if(pos < 500)
-            buf[pos++] = c;
+        if(p < 500)
+            buf[p++] = c;
         else fprintf(stderr, "error: many indent symbols\n");
     }
     ungetch(c);
 
     while((c = getch()) == ' ' || c == '\t') {
-        if(pos < 500)
-            buf[pos++] = c;
+        if(p < 500)
+            buf[p++] = c;
         else fprintf(stderr, "error: many indent symbols\n");
     }
+    ungetch(c);
 
     if(c != '\n' && c != EOF) {
         /*вывод буфера*/
-        for(int i = 0; i < pos; ++i)
+        for(int i = 0; i < *pos; ++i)
+                printf("%c", spaceChar[i]);
+        *pos = 0;
+        /*вывод буфера*/  
+        for(int i = 0; i < p; ++i)
             printf("%c", buf[i]);
     }
-    
-    ungetch(c);
 }
 
 void backslash(void) {
@@ -712,10 +715,11 @@ int bufferInlineSpaces(int c, char *spaceChar, int *pos) {
             spaceChar[(*pos)++] = c;
             return 1;
         }
-        else if(c == '#' && peek() != NULL && peek()->type == HEADING) {
-            /*внутри заголовка в конце отбрасываются # вместе с пробелами*/
+        else if(prevch() == ' ' && c == '#' && peek() != NULL && peek()->type == HEADING) {
+            /*обработка внутри заголовка*/
             ungetch(c);
-            return 0;
+            headingTrailingHashes(spaceChar, pos);
+            return 1;
         }
         else if(c == '\n') {
             if((pt = peek()) != NULL) {
