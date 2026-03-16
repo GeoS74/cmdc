@@ -19,7 +19,8 @@ void popAndClose(int *blankLines, int *lineStart);
 int isCodeBlockInline(void);
 int isCodeBlockFenced(void);
 void codeBlockInline(void);
-void codeBlockFenced(void);
+void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent);
+void openCodeBlockFenced(int *blankLines, int *lineStart);
 void printBackTicks(void);
 
 void parser(void) {
@@ -78,7 +79,7 @@ void parser(void) {
 
             if(c == '`' || c == '~')
                 if(isCodeBlockFenced())
-                    codeBlockFenced();
+                    codeBlockFenced(&blankLines, &lineStart, lastIndent);
                 else
                     paragraph(&blankLines, &lineStart);
 
@@ -86,7 +87,6 @@ void parser(void) {
                 thematicBreak(&blankLines, &lineStart, lastIndent);
             else
                 paragraph(&blankLines, &lineStart);
-                 
         }
         /*экранирование*/
         else if(c == '\\') {
@@ -350,16 +350,124 @@ int isCodeBlockFenced(void) {
     return c == initChar ? 0 : 1;
 }
 
-void codeBlockFenced(){
-    printf("codeBlockFenced\n");
-    // struct tag *pt, t;
 
-    // t = getTag(CODE_BLOCK);
-    // t.kind = initChar == '`' ? FENCED_BACKTICK : FENCED_TILDE;
-    // t.level = count;
+
+int isCloseCodeBlockFenced(void) {
+    int c, initChar;
+
+    char buf[500];
+    int pos = 0;
+
+    initChar = getch();
+    buf[pos++] = initChar;
+
+    while((c = getch()) == initChar) {
+        if(pos < 500)
+            buf[pos++] = c;
+        else fprintf(stderr, "error: many indent symbols\n");
+    }
+    ungetch(c);
+
+    while((c = getch()) == ' ' || c == '\t') {
+        if(pos < 500)
+            buf[pos++] = c;
+        else fprintf(stderr, "error: many indent symbols\n");
+    }
+    ungetch(c);
+
+    if(c == '\n' || c == EOF) {
+        ungetch(c);
+        return 1;
+    }
+
+    /*возврат символов в поток*/
+    while(pos > 0)
+        ungetch(buf[--pos]);
+    return 0;
 }
 
+void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent){
+    openCodeBlockFenced(blankLines, lineStart);
 
+    int c, indent, hasContent;
+    indent = 0;
+    hasContent = 0;
+
+    while((c = getch()) != EOF) {
+        if(c == ' ' && !hasContent && indent < lastIndent) {
+            ++indent;
+            continue;
+        }
+
+        if(c == '\n') {
+            printf("\n");
+            hasContent = 0;
+            indent = 0;
+            continue;
+        }
+
+        if(c == '`' || c == '~') {
+            ungetch(c);
+            if(isCloseCodeBlockFenced()) {
+                popAndClose(blankLines, lineStart);
+                // printf("\n");
+                break;
+            }
+            while((c = getch()) == '`' || c == '~')
+                printf("%c", c);
+        }
+
+        hasContent = 1;
+        printHTMLEntities(c);
+    }
+}
+
+void openCodeBlockFenced(int *blankLines, int *lineStart) {
+    int c, initChar;
+    struct tag *pt, t;
+
+    if(peek() != NULL) {
+        /*закрыть инлайн теги*/
+        while((pt = peek()) && pt->singleLine == 1) {
+            pt->close(pt);
+            pop();
+        }
+    }
+    /*закрыть многострочный тег тег*/
+    popAndClose(blankLines, lineStart);
+
+    /*создать открывающий тег*/
+    t = getTag(CODE_BLOCK);
+    initChar = getch();
+    t.kind = initChar == '`' ? FENCED_BACKTICK : FENCED_TILDE;
+    t.level = 1;
+    push(t);
+
+    while((c = getch()) == initChar)
+        t.level++;
+    ungetch(c);
+
+    /*пропустить пробелы и табуляции*/
+    while((c = getch()) == ' ' || c == '\t')
+        ;
+
+    printf("<pre><code");
+    /*получить название класса*/
+    if(c != '\n' && c != EOF) {
+        ungetch(c);
+        printf(" class=\"language-");
+        while((c = getch()) != '\n' && c != EOF && c != ' ')
+            printf("%c", c);
+        printf("\"");
+    }
+    printf(">");
+
+    /*отбросить всё остальное*/
+    if(c == ' ') {
+        while((c = getch()) != '\n' && c != EOF)
+            ;
+    }
+}
 
 
 

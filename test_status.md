@@ -473,6 +473,20 @@
     <pre><code>foo  
     </code></pre>
     ```
+### Fenced code blocks
+- [x] Example 119:
+    ````
+    ```
+    <
+    ·>
+    ```
+    ````
+    ->
+    ```
+    <pre><code>&lt;
+    ·&gt;
+    </code></pre>
+    ```
 ### Paragraphs
 - [x] Example 219:
     ```
