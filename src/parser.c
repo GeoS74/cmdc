@@ -18,6 +18,7 @@ void popAndClose(int *blankLines, int *lineStart);
 
 int isCodeBlockInline(void);
 int isCodeBlockFenced(void);
+int isCloseCodeBlockFenced(void);
 void codeBlockInline(void);
 void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent);
 void openCodeBlockFenced(int *blankLines, int *lineStart);
@@ -350,42 +351,6 @@ int isCodeBlockFenced(void) {
     return c == initChar ? 0 : 1;
 }
 
-
-
-int isCloseCodeBlockFenced(void) {
-    int c, initChar;
-
-    char buf[500];
-    int pos = 0;
-
-    initChar = getch();
-    buf[pos++] = initChar;
-
-    while((c = getch()) == initChar) {
-        if(pos < 500)
-            buf[pos++] = c;
-        else fprintf(stderr, "error: many indent symbols\n");
-    }
-    ungetch(c);
-
-    while((c = getch()) == ' ' || c == '\t') {
-        if(pos < 500)
-            buf[pos++] = c;
-        else fprintf(stderr, "error: many indent symbols\n");
-    }
-    ungetch(c);
-
-    if(c == '\n' || c == EOF) {
-        ungetch(c);
-        return 1;
-    }
-
-    /*возврат символов в поток*/
-    while(pos > 0)
-        ungetch(buf[--pos]);
-    return 0;
-}
-
 void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent){
     openCodeBlockFenced(blankLines, lineStart);
 
@@ -469,6 +434,39 @@ void openCodeBlockFenced(int *blankLines, int *lineStart) {
     }
 }
 
+int isCloseCodeBlockFenced(void) {
+    int c, initChar;
+
+    char buf[500];
+    int pos = 0;
+
+    initChar = getch();
+    buf[pos++] = initChar;
+
+    while((c = getch()) == initChar) {
+        if(pos < 500)
+            buf[pos++] = c;
+        else fprintf(stderr, "error: many indent symbols\n");
+    }
+    ungetch(c);
+
+    while((c = getch()) == ' ' || c == '\t') {
+        if(pos < 500)
+            buf[pos++] = c;
+        else fprintf(stderr, "error: many indent symbols\n");
+    }
+    ungetch(c);
+
+    if(c == '\n' || c == EOF) {
+        ungetch(c);
+        return 1;
+    }
+
+    /*возврат символов в поток*/
+    while(pos > 0)
+        ungetch(buf[--pos]);
+    return 0;
+}
 
 
 
