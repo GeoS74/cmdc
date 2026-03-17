@@ -487,6 +487,70 @@
     ·&gt;
     </code></pre>
     ```
+- [x] Example 120:
+    ````
+    ~~~
+    <
+    ·>
+    ~~~
+    ````
+    ->
+    ```
+    <pre><code>&lt;
+    ·&gt;
+    </code></pre>
+    ```
+- [x] Example 121:
+    ````
+    ``
+    foo
+    ``
+    ````
+    ->
+    ```
+    <p><code>foo</code></p>
+    ```
+- [x] Example 122:
+    ````
+    ```
+    aaa
+    ~~~
+    ```
+    ````
+    ->
+    ```
+    <pre><code>aaa
+    ~~~
+    </code></pre>
+    ```
+- [x] Example 123:
+    ````
+    ~~~
+    aaa
+    ```
+    ~~~
+    ````
+    ->
+    ```
+    <pre><code>aaa
+    ```
+    </code></pre>
+    ```
+- [x] Example 124:
+    ~~~
+    ````
+    aaa
+    ```
+    ``````
+    ~~~
+    ->
+    ```
+    <pre><code>aaa
+    ```
+    </code></pre>
+    ```
+    </code></pre>
+    ```
 ### Paragraphs
 - [x] Example 219:
     ```

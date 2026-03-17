@@ -111,7 +111,7 @@ void parser(void) {
     /*финальное закрытие всех блоков*/
     if(peek() != NULL) {
         while((pt = pop())) {
-            if(pt->type == CODE_BLOCK) {
+            if(pt->type == CODE_BLOCK && pt->kind == INDENTED) {
                 flushBufferInlineSpaces(spaceChar, &pos);
                 /*если не было переноса строки перед закрытием блока вывести его*/
                 if(blankLines == 0)
@@ -371,11 +371,18 @@ void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent){
             continue;
         }
 
-        if(c == '`' || c == '~') {
+        if((c == '`' && peek()->kind == FENCED_BACKTICK) || (c == '~' && peek()->kind == FENCED_TILDE)) {
             ungetch(c);
             if(isCloseCodeBlockFenced()) {
                 popAndClose(blankLines, lineStart);
-                // printf("\n");
+
+                if((c = getch()) == '\n')
+                    printf("\n");
+                else {
+                    hasContent = 0; // не выводить финальный символ переноса (см. ниже)
+                    ungetch(c);
+                }
+                     
                 break;
             }
             while((c = getch()) == '`' || c == '~')
@@ -385,6 +392,15 @@ void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent){
         hasContent = 1;
         printHTMLEntities(c);
     }
+
+    /*финальный символ переноса*/
+    /*???????????????BUG DETECTED
+    не правильный вывод
+    ```
+    пробел
+    */
+    if(hasContent)
+        printf("\n");
 }
 
 void openCodeBlockFenced(int *blankLines, int *lineStart) {
@@ -406,11 +422,12 @@ void openCodeBlockFenced(int *blankLines, int *lineStart) {
     initChar = getch();
     t.kind = initChar == '`' ? FENCED_BACKTICK : FENCED_TILDE;
     t.level = 1;
-    push(t);
 
     while((c = getch()) == initChar)
         t.level++;
     ungetch(c);
+
+    push(t);
 
     /*пропустить пробелы и табуляции*/
     while((c = getch()) == ' ' || c == '\t')
@@ -449,6 +466,13 @@ int isCloseCodeBlockFenced(void) {
         else fprintf(stderr, "error: many indent symbols\n");
     }
     ungetch(c);
+
+    if(peek()->level > pos) {
+        /*возврат символов в поток*/
+        while(pos > 0)
+            ungetch(buf[--pos]);
+        return 0;
+    }
 
     while((c = getch()) == ' ' || c == '\t') {
         if(pos < 500)
