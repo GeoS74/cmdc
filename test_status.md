@@ -531,11 +531,11 @@
     ~~~
     ````
     ->
-    ```
+    ````
     <pre><code>aaa
     ```
     </code></pre>
-    ```
+    ````
 - [x] Example 124:
     ~~~
     ````
@@ -544,13 +544,161 @@
     ``````
     ~~~
     ->
-    ```
+    ````
     <pre><code>aaa
     ```
     </code></pre>
+    ````
+- [x] Example 125:
     ```
+    ~~~~
+    aaa
+    ~~~
+    ~~~~
+    ```
+    ->
+    ```
+    <pre><code>aaa
+    ~~~
     </code></pre>
     ```
+- [x] Example 126:
+    ````
+    ```
+    ````
+    ->
+    ```
+    <pre><code></code></pre>
+    ```
+- [x] Example 127:
+    ~~~
+    `````
+
+    ```
+    aaa
+    ~~~
+    ->
+    ````
+    <pre><code>
+    ```
+    aaa
+    </code></pre>
+    ````
+- [ ] Example 128:
+    ~~~
+    >·```
+    >·aaa
+
+    bbb
+    ~~~
+    ->
+    ````
+    <blockquote>
+    <pre><code>aaa
+    </code></pre>
+    </blockquote>
+    <p>bbb</p>
+    ````
+- [x] Example 129:
+    ~~~
+    ```
+
+    ··
+    ```
+    ~~~
+    ->
+    ````
+    <pre><code>
+    ··
+    </code></pre>
+    ````
+- [x] Example 130:
+    ~~~
+    ```
+    ```
+    ~~~
+    ->
+    ````
+    <pre><code></code></pre>
+    ````
+- [x] Example 131:
+    ~~~
+    ·```
+    ·aaa
+    aaa
+    ```
+    ~~~
+    ->
+    ````
+    <pre><code>aaa
+    aaa
+    </code></pre>
+    ````
+- [x] Example 132:
+    ~~~
+    ··```
+    aaa
+    ··aaa
+    aaa
+    ··```
+    ~~~
+    ->
+    ````
+    <pre><code>aaa
+    aaa
+    aaa
+    </code></pre>
+    ````
+- [x] Example 133:
+    ~~~
+    ···```
+    ···aaa
+    ····aaa
+    ··aaa
+    ···```
+    ~~~
+    ->
+    ````
+    <pre><code>aaa
+    ·aaa
+    aaa
+    </code></pre>
+    ````
+- [x] Example 134:
+    ~~~
+    ····```
+    ····aaa
+    ····```
+    ~~~
+    ->
+    ````
+    <pre><code>```
+    aaa
+    ```
+    </code></pre>
+    ````
+- [x] Example 135:
+    ~~~
+    ```
+    aaa
+    ··```
+    ~~~
+    ->
+    ````
+    <pre><code>aaa
+    </code></pre>
+    ````
+- [x] Example 136:
+    ~~~
+    ···```
+    aaa
+    ··```
+    ~~~
+    ->
+    ````
+    <pre><code>aaa
+    </code></pre>
+    ````
 ### Paragraphs
 - [x] Example 219:
     ```

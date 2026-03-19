@@ -359,38 +359,55 @@ void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent){
     hasContent = 0;
 
     while((c = getch()) != EOF) {
-        if(c == ' ' && !hasContent && indent < lastIndent) {
+        // if(c == ' ' && !hasContent && indent < lastIndent) {
+        //     ++indent;
+        //     continue;
+        // }
+        if(c == ' ') {
             ++indent;
             continue;
         }
 
         if(c == '\n') {
+            while(indent-- > lastIndent)
+                printf(" ");
+
             printf("\n");
             hasContent = 0;
             indent = 0;
             continue;
         }
 
-        if((c == '`' && peek()->kind == FENCED_BACKTICK) || (c == '~' && peek()->kind == FENCED_TILDE)) {
-            ungetch(c);
-            if(isCloseCodeBlockFenced()) {
-                popAndClose(blankLines, lineStart);
+        if(indent < 4) {
+            if((c == '`' && peek()->kind == FENCED_BACKTICK) || 
+               (c == '~' && peek()->kind == FENCED_TILDE)) {
 
-                if((c = getch()) == '\n')
-                    printf("\n");
-                else {
-                    hasContent = 0; // не выводить финальный символ переноса (см. ниже)
-                    ungetch(c);
+                ungetch(c);
+                if(isCloseCodeBlockFenced()) {
+                    popAndClose(blankLines, lineStart);
+
+                    if((c = getch()) == '\n')
+                        printf("\n");
+                    else {
+                        hasContent = 0; // не выводить финальный символ переноса (см. ниже)
+                        ungetch(c);
+                    }
+                        
+                    break;
                 }
-                     
-                break;
+                while(indent-- > lastIndent)
+                    printf(" ");
+
+                while((c = getch()) == '`' || c == '~')
+                    printf("%c", c);
+                ungetch(c);
+                hasContent = 1;
+                continue;
             }
-            while((c = getch()) == '`' || c == '~')
-                printf("%c", c);
-            ungetch(c);
-            hasContent = 1;
-            continue;
         }
+
+        while(indent-- > lastIndent)
+            printf(" ");
 
         hasContent = 1;
         printHTMLEntities(c);
