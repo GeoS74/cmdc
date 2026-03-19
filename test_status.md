@@ -699,6 +699,40 @@
     <pre><code>aaa
     </code></pre>
     ````
+- [x] Example 137:
+    ~~~
+    ```
+    aaa
+    ····```
+    ~~~
+    ->
+    ````
+    <pre><code>aaa
+    ····```
+    </code></pre>
+    ````
+- [x] Example 138:
+    ~~~
+    ```·```
+    aaa
+    ~~~
+    ->
+    ````
+    <p><code>·</code>
+    aaa</p>
+    ````
+- [x] Example 139:
+    ```
+    ~~~~~~
+    aaa
+    ~~~·~~
+    ```
+    ->
+    ````
+    <pre><code>aaa
+    ~~~·~~
+    </code></pre>
+    ````
 ### Paragraphs
 - [x] Example 219:
     ```

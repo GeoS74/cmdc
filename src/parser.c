@@ -363,7 +363,7 @@ void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent){
         //     ++indent;
         //     continue;
         // }
-        if(c == ' ') {
+        if(c == ' ' && !hasContent) {
             ++indent;
             continue;
         }
