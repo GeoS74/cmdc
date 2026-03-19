@@ -334,15 +334,19 @@ int isCodeBlockFenced(void) {
         return 0;
     }
     
-    while((c = getch()) != '\n' && c != EOF) {
-        if(c == initChar)
-            break;
+    /*если блок кода открывается символом (`), проверить оставшиеся символы на наличие (`)*/
+    /*прервать если (`) есть, т.к. возможно это инлайн блок кода*/
+    if(initChar == '`') {
+        while((c = getch()) != '\n' && c != EOF) {
+            if(c == initChar)
+                break;
 
-        if(pos < 500)
-            buf[pos++] = c;
-        else fprintf(stderr, "error: many indent symbols\n");
+            if(pos < 500)
+                buf[pos++] = c;
+            else fprintf(stderr, "error: many indent symbols\n");
+        }
+        ungetch(c);
     }
-    ungetch(c);
 
     /*возврат символов в поток*/
     while(pos > 0)
@@ -359,10 +363,6 @@ void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent){
     hasContent = 0;
 
     while((c = getch()) != EOF) {
-        // if(c == ' ' && !hasContent && indent < lastIndent) {
-        //     ++indent;
-        //     continue;
-        // }
         if(c == ' ' && !hasContent) {
             ++indent;
             continue;
@@ -427,9 +427,11 @@ void openCodeBlockFenced(int *blankLines, int *lineStart) {
             pt->close(pt);
             pop();
         }
+
+        /*закрыть многострочный тег тег*/
+        popAndClose(blankLines, lineStart);
+        printf("\n");
     }
-    /*закрыть многострочный тег тег*/
-    popAndClose(blankLines, lineStart);
 
     /*создать открывающий тег*/
     t = getTag(CODE_BLOCK);

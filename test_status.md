@@ -733,6 +733,108 @@
     ~~~·~~
     </code></pre>
     ````
+- [x] Example 140:
+    ~~~
+    foo
+    ```
+    bar
+    ```
+    baz
+    ~~~
+    ->
+    ````
+    <p>foo</p>
+    <pre><code>bar
+    </code></pre>
+    <p>baz</p>
+    ````
+- [ ] Example 141:
+    ~~~~~
+    foo
+    ---
+    ~~~
+    bar
+    ~~~
+    # baz
+    ~~~~~
+    ->
+    ````
+    <h2>foo</h2>
+    <pre><code>bar
+    </code></pre>
+    <h1>baz</h1>
+    ````
+- [x] Example 142:
+    ~~~
+    ```ruby
+    def·foo(x)
+    ··return 3
+    end
+    ```
+    ~~~
+    ->
+    ````
+    <pre><code class="language-ruby">def·foo(x)
+    ··return 3
+    end
+    </code></pre>
+    ````
+- [x] Example 143:
+    ```
+    ~~~~····ruby·startline=3·$%@#$
+    def·foo(x)
+    ··return·3
+    end
+    ~~~~~~~
+    ```
+    ->
+    ````
+    <pre><code class="language-ruby">def·foo(x)
+    ··return·3
+    end
+    </code></pre>
+    ````
+- [x] Example 144:
+    ~~~
+    ````;
+    ````
+    ~~~
+    ->
+    ````
+    <pre><code class="language-;"></code></pre>
+    ````
+- [x] Example 145:
+    ~~~
+    ```·aa·```
+    foo
+    ~~~
+    ->
+    ````
+    <p><code>aa</code>
+    foo</p>
+    ````
+- [x] Example 146:
+    ```
+    ~~~·aa·```·~~~
+    foo
+    ~~~
+    ```
+    ->
+    ````
+    <pre><code class="language-aa">foo
+    </code></pre>
+    ````
+- [x] Example 147:
+    ~~~
+    ```
+    ```·aaa
+    ```
+    ~~~
+    ->
+    ````
+    <pre><code>```·aaa
+    </code></pre>
+    ````
 ### Paragraphs
 - [x] Example 219:
     ```
