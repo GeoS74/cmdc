@@ -387,18 +387,15 @@ void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent){
             }
             while((c = getch()) == '`' || c == '~')
                 printf("%c", c);
+            ungetch(c);
+            hasContent = 1;
+            continue;
         }
 
         hasContent = 1;
         printHTMLEntities(c);
     }
 
-    /*финальный символ переноса*/
-    /*???????????????BUG DETECTED
-    не правильный вывод
-    ```
-    пробел
-    */
     if(hasContent)
         printf("\n");
 }
