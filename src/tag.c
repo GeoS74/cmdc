@@ -31,6 +31,15 @@ struct tag *peek(void) {
     }
 }
 
+struct tag *findByBlockType(enum blockType type) {
+    int i = pos;
+    while(--i >= 0) {
+        if(buf[i].type == type)
+            return &buf[i];
+    }
+    return NULL;
+}
+
 static void printCloseTag(struct tag *self) {
     if(self->htmlTag != NULL) {
         if(self->level > 0 && self->type == HEADING)
