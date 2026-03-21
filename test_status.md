@@ -972,6 +972,47 @@
     baz</p>
     </blockquote>
     ```
+- [x] Example 230:
+    ```
+    ···>·#·Foo
+    ···>·bar
+    ·>·baz
+    ```
+    ->
+    ```
+    <blockquote>
+    <h1>Foo</h1>
+    <p>bar
+    baz</p>
+    </blockquote>
+    ```
+- [x] Example 231:
+    ```
+    ····>·#·Foo
+    ····>·bar
+    ····>·baz
+    ```
+    ->
+    ```
+    <pre><code>&gt; # Foo
+    &gt; bar
+    &gt; baz
+    </code></pre>
+    ```
+- [x] Example 232:
+    ```
+    >·#·Foo
+    >·bar
+    baz
+    ```
+    ->
+    ```
+    <blockquote>
+    <h1>Foo</h1>
+    <p>bar
+    baz</p>
+    </blockquote>
+    ```
 
 
 ### Code spans

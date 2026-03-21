@@ -771,6 +771,9 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
             else
                 indent = 0;
         }
+        else if(pt->type == BLOCKQUOTE) {
+            *lineStart = 0;
+        }
     }
     /*вне блока*/
     else {
