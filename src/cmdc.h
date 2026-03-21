@@ -15,7 +15,8 @@ enum blockType {
     PARAGRAPH,
     HEADING,
     CODE_BLOCK,
-    CODE_INLINE
+    CODE_INLINE,
+    BLOCKQUOTE
 };
 
 /* Роды блоков (вариации) */
@@ -38,9 +39,11 @@ struct tag {
 
 /*генерирует структуры тегов*/
 struct tag getTag(enum blockType);
+/*функции для раоты со стеком тегов*/
 void push(struct tag t);
 struct tag *pop(void);
 struct tag *peek(void);
+struct tag *findByBlockType(enum blockType);
 
 /*печатает экранируемый символ*/
 void printEscapedChar(int c);

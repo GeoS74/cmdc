@@ -24,6 +24,8 @@ void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent);
 void openCodeBlockFenced(int *blankLines, int *lineStart);
 void printBackTicks(void);
 
+void blockquote(int *blankLines, int *lineStart);
+
 void parser(void) {
     /*
     переменная hasContent перенесена в функцию bufferInlineSpaces
@@ -74,6 +76,16 @@ void parser(void) {
 
             printf("\n");
         }
+        else if(c == '#' && lineStart == 1 && peek() != NULL && peek()->type == BLOCKQUOTE) {
+            ungetch(c);
+            printf("\n");
+            heading();
+
+            // if(lastIndent < 4)
+            //     popAndClose(&blankLines, &lineStart);
+
+            // printf("\n");
+        }
         /*любой не пробельный символ в начале строки*/
         else if(lineStart == 1) {
             ungetch(c);
@@ -86,6 +98,8 @@ void parser(void) {
 
             else if(c == '*' || c == '-' || c == '_') /*тематический разрыв*/
                 thematicBreak(&blankLines, &lineStart, lastIndent);
+            else if(c == '>') /*цитата*/
+                blockquote(&blankLines, &lineStart);
             else
                 paragraph(&blankLines, &lineStart);
         }
@@ -117,9 +131,57 @@ void parser(void) {
                 if(blankLines == 0)
                     printf("\n");
             }
+            else if(pt->type == BLOCKQUOTE) {
+                printf("\n");
+            }
             pt->close(pt);
         }
     }
+}
+
+void blockquote(int *blankLines, int *lineStart) {
+    struct tag t, *blockquote;
+    int c, level;
+
+    level = 0;
+    while((c = getch()) == '>' || c == ' ' || c == '\t')
+        if(c == '>')
+            ++level;
+    ungetch(c);
+
+    blockquote = findByBlockType(BLOCKQUOTE);
+    if(blockquote) {
+        if(blockquote->level < level) {
+            int i = level - blockquote->level;
+
+            if(i > 0 && peek()) {
+                popAndClose(blankLines, lineStart);
+                printf("\n");
+            }
+
+            while(i-- > 0) {
+                t = getTag(BLOCKQUOTE);
+                t.level = level - i;
+                push(t);
+                printf("<blockquote>");
+            }
+        }
+    }
+    else {
+        int i = level;
+        while(i-- > 0) {
+            t = getTag(BLOCKQUOTE);
+            t.level = level - i;
+            push(t);
+            printf("<blockquote>");
+            /*не выводить перенос строки для последнего тега blockquote*/
+            if(i > 0)
+                printf("\n");
+        }
+     }
+
+    *blankLines = 0;
+    *lineStart = 0;
 }
 
 
@@ -585,13 +647,30 @@ void paragraph(int *blankLines, int *lineStart) {
     if((pt = peek()) != NULL) {
         if(pt->type == CODE_BLOCK && pt->kind == INDENTED) {
             popAndClose(blankLines, lineStart);
+            printf("\n");
         }
         else if(pt->type == PARAGRAPH) {
             if(*blankLines > 0) {
                 popAndClose(blankLines, lineStart);
+                printf("\n");
+
+                if(peek() && peek()->type == BLOCKQUOTE) {
+                    /*закрыть все уровни blockquote*/
+                    while((pt = pop()) != NULL) {
+                        pt->close(pt);
+                        printf("\n");
+                    }
+                }
             }
+            else
+                printf("\n");
         }
-        printf("\n");
+        else if(pt->type == BLOCKQUOTE) {
+            push(getTag(PARAGRAPH));
+            // printf("\n");
+            printf("<p>");
+        }
+        // printf("\n");
     }
     else {
         push(getTag(PARAGRAPH));

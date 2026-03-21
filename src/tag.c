@@ -79,6 +79,10 @@ struct tag getTag(enum blockType type) {
             t.type = CODE_INLINE;
             t.htmlTag = "code";
             break;
+        case BLOCKQUOTE:
+            t.type = BLOCKQUOTE;
+            t.htmlTag = "blockquote";
+            break;
         default:
             fprintf(stderr, "error: unknown tag name\n");
             break;

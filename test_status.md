@@ -943,6 +943,37 @@
     <p>aaa</p>
     <h1>aaa</h1>
     ```
+### Block quotes
+- [x] Example 228:
+    ```
+    >·#·Foo
+    >·bar
+    >·baz
+    ```
+    ->
+    ```
+    <blockquote>
+    <h1>Foo</h1>
+    <p>bar
+    baz</p>
+    </blockquote>
+    ```
+- [x] Example 229:
+    ```
+    >#·Foo
+    >bar
+    >·baz
+    ```
+    ->
+    ```
+    <blockquote>
+    <h1>Foo</h1>
+    <p>bar
+    baz</p>
+    </blockquote>
+    ```
+
+
 ### Code spans
 - [x] Example 327:
     ```
