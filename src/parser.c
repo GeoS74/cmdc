@@ -55,6 +55,9 @@ void parser(void) {
 
         /*обработка отступов и пустых строк*/
         if(lineStart == 1 && isspace(c)) {
+            /*если предыдущий символ это пробел, то строка входит в блок цитат*/
+            // int foo = prevch();
+
             ungetch(c);
             tabs(&blankLines, &lineStart, &lastIndent);
         }
@@ -755,6 +758,9 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
     struct tag *pt;
     int indent, c;
 
+    /*если предыдущий символ это пробел, то строка входит в блок цитат*/
+    int isBlockquote = prevch() == ' ';
+
     char spaceChar[100] = {0};
     int pos = 0;
 
@@ -777,6 +783,10 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
     }
     else
         ungetch(c);
+
+    // if(!isBlockquote && findByBlockType(BLOCKQUOTE)) {
+
+    // }
 
     /*внутри какого-то блока*/
     if((pt = peek()) != NULL) {
