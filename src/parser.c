@@ -139,15 +139,42 @@ void parser(void) {
     }
 }
 
+
 void blockquote(int *blankLines, int *lineStart) {
     struct tag t, *blockquote;
-    int c, level;
+    int c, level, indent;
+
+    char spaceChar[100];
+    int pos = 0;
 
     level = 0;
-    while((c = getch()) == '>' || c == ' ' || c == '\t')
-        if(c == '>')
+    indent = 0;
+    while((c = getch()) == '>' || c == ' ' || c == '\t') {
+        if(c == '>') {
             ++level;
+            indent = 0;
+            pos = 0;
+        }
+        else {
+            indent += (c == '\t') ? TAB_STEP : 1;
+            if(pos < 100)
+                spaceChar[pos++] = c;
+            else
+                fprintf(stderr, "error: many indent symbols\n");
+        }
+    }
     ungetch(c);
+    if(indent > 4) {
+        /*возврат символов в поток, кроме первого
+        если символ таб, то такая ситуация явно не описывается в спецификации.
+        Из экспериментов с примерами стало ясно, что 
+        в блоке цитат формируется кодовый блок с отступами в случае
+        если идет последовательность:
+        > таб пробел пробел пробел
+        это странно*/
+        while(pos > 1)
+            ungetch(spaceChar[--pos]);
+    }
 
     blockquote = findByBlockType(BLOCKQUOTE);
     if(blockquote) {
@@ -781,7 +808,16 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
                 indent = 0;
         }
         else if(pt->type == BLOCKQUOTE) {
-            *lineStart = 0;
+            if(indent > TAB_STEP) {
+                struct tag t = getTag(CODE_BLOCK);
+                t.kind = INDENTED;
+                push(t);
+                printf("\n");
+                printf("<pre><code>");
+                *blankLines = 0;
+            }
+            else 
+                indent = 0;
         }
     }
     /*вне блока*/
