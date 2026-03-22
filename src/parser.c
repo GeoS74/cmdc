@@ -985,7 +985,7 @@ int bufferInlineSpaces(int c, char *spaceChar, int *pos) {
     static int hasContent = 0;
 
     if(!hasContent)
-        hasContent = (c != ' ' && c != '\t');
+        hasContent = (c != ' ' && c != '\t' && c != '>');
         
     if(hasContent) {
         if(c == ' ' || c == '\t') {
