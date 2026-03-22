@@ -808,7 +808,7 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
                 indent = 0;
         }
         else if(pt->type == BLOCKQUOTE) {
-            if(indent > TAB_STEP) {
+            if(indent >= TAB_STEP) {
                 struct tag t = getTag(CODE_BLOCK);
                 t.kind = INDENTED;
                 push(t);
