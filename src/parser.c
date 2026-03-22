@@ -605,6 +605,7 @@ void thematicBreak(int *blankLines, int *lineStart, int lastIndent) {
             ungetch(buf[--pos]);
 
     if((pt = peek()) != NULL) {
+
         if(pt->type == CODE_BLOCK && pt->kind == INDENTED) {
             popAndClose(blankLines, lineStart);
         }
@@ -614,6 +615,14 @@ void thematicBreak(int *blankLines, int *lineStart, int lastIndent) {
             }
         }
         printf("\n");
+
+        /*закрыть все уровни blockquote*/
+        if((pt = peek()) != NULL && pt->type == BLOCKQUOTE) {
+            while((pt = pop()) != NULL) {
+                pt->close(pt);
+                printf("\n");
+            }
+        }
 
         if(isBreaks) {
             printf("<hr />");
@@ -667,7 +676,7 @@ void paragraph(int *blankLines, int *lineStart) {
         }
         else if(pt->type == BLOCKQUOTE) {
             push(getTag(PARAGRAPH));
-            // printf("\n");
+            printf("\n");
             printf("<p>");
         }
         // printf("\n");
@@ -698,7 +707,7 @@ void newLine(int *blankLines, int *lineStart) {
             for(; *blankLines > 0; --*blankLines)
                 printf("\n");
         }
-        else if(pt->type == PARAGRAPH) {
+        else if(pt->type == PARAGRAPH || pt->type == BLOCKQUOTE) {
             *lineStart = 0;
             *blankLines = 0;
             return;

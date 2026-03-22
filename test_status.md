@@ -1013,6 +1013,48 @@
     baz</p>
     </blockquote>
     ```
+- [x] Example 233:
+    ```
+    >·bar
+    baz
+    >·foo
+    ```
+    ->
+    ```
+    <blockquote>
+    <p>bar
+    baz
+    foo</p>
+    </blockquote>
+    ```
+- [x] Example 234:
+    ```
+    >·foo
+    ---
+    ```
+    ->
+    ```
+    <blockquote>
+    <p>foo</p>
+    </blockquote>
+    <hr />
+    ```
+- [ ] Example 235:
+    ```
+    >·-·foo
+    -·bar
+    ```
+    ->
+    ```
+    <blockquote>
+    <ul>
+    <li>foo</li>
+    </ul>
+    </blockquote>
+    <ul>
+    <li>bar</li>
+    </ul>
+    ```
 
 
 ### Code spans
