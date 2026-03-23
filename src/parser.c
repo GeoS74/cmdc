@@ -55,9 +55,6 @@ void parser(void) {
 
         /*обработка отступов и пустых строк*/
         if(lineStart == 1 && isspace(c)) {
-            /*если предыдущий символ это пробел, то строка входит в блок цитат*/
-            // int foo = prevch();
-
             ungetch(c);
             tabs(&blankLines, &lineStart, &lastIndent);
         }
@@ -82,11 +79,6 @@ void parser(void) {
         else if(c == '#' && lineStart == 1 && peek() != NULL && peek()->type == BLOCKQUOTE) {
             ungetch(c);
             heading();
-
-            // if(lastIndent < 4)
-            //     popAndClose(&blankLines, &lineStart);
-
-            // printf("\n");
         }
         /*любой не пробельный символ в начале строки*/
         else if(lineStart == 1) {
@@ -704,7 +696,6 @@ void paragraph(int *blankLines, int *lineStart) {
         }
         else if(pt->type == BLOCKQUOTE) {
             push(getTag(PARAGRAPH));
-            // printf("\n");
             printf("<p>");
         }
         // printf("\n");
