@@ -135,7 +135,7 @@ void parser(void) {
 
 
 void blockquote(int *blankLines, int *lineStart) {
-    struct tag t, *blockquote;
+    struct tag t, *pt, *blockquote;
     int c, level, indent;
 
     char spaceChar[100];
@@ -190,6 +190,11 @@ void blockquote(int *blankLines, int *lineStart) {
         }
     }
     else {
+        if((pt = peek()) != NULL) {
+            popAndClose(blankLines, lineStart);
+            printf("\n");
+        }
+
         int i = level;
         while(i-- > 0) {
             t = getTag(BLOCKQUOTE);
