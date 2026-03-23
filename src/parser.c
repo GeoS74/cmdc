@@ -204,9 +204,6 @@ void blockquote(int *blankLines, int *lineStart) {
             t.level = level - i;
             push(t);
             printf("<blockquote>");
-            /*не выводить перенос строки для последнего тега blockquote*/
-            // if(i > 0)
-            //     printf("\n");
             printf("\n");
         }
      }
@@ -826,7 +823,6 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
                 struct tag t = getTag(CODE_BLOCK);
                 t.kind = INDENTED;
                 push(t);
-                printf("\n");
                 printf("<pre><code>");
                 *blankLines = 0;
             }
