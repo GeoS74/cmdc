@@ -81,7 +81,6 @@ void parser(void) {
         }
         else if(c == '#' && lineStart == 1 && peek() != NULL && peek()->type == BLOCKQUOTE) {
             ungetch(c);
-            printf("\n");
             heading();
 
             // if(lastIndent < 4)
@@ -194,6 +193,7 @@ void blockquote(int *blankLines, int *lineStart) {
                 t.level = level - i;
                 push(t);
                 printf("<blockquote>");
+                printf("\n");
             }
         }
     }
@@ -205,8 +205,9 @@ void blockquote(int *blankLines, int *lineStart) {
             push(t);
             printf("<blockquote>");
             /*не выводить перенос строки для последнего тега blockquote*/
-            if(i > 0)
-                printf("\n");
+            // if(i > 0)
+            //     printf("\n");
+            printf("\n");
         }
      }
 
@@ -706,7 +707,7 @@ void paragraph(int *blankLines, int *lineStart) {
         }
         else if(pt->type == BLOCKQUOTE) {
             push(getTag(PARAGRAPH));
-            printf("\n");
+            // printf("\n");
             printf("<p>");
         }
         // printf("\n");
@@ -737,7 +738,7 @@ void newLine(int *blankLines, int *lineStart) {
             for(; *blankLines > 0; --*blankLines)
                 printf("\n");
         }
-        else if(pt->type == PARAGRAPH || pt->type == BLOCKQUOTE) {
+        else if(pt->type == PARAGRAPH) {
             *lineStart = 0;
             *blankLines = 0;
             return;
@@ -759,7 +760,14 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
     int indent, c;
 
     /*если предыдущий символ это пробел, то строка входит в блок цитат*/
-    int isBlockquote = prevch() == ' ';
+    // int isBlockquoteLine = prevch() == ' ';
+    // if(!isBlockquoteLine && findByBlockType(BLOCKQUOTE)) {
+    //     /*закрыть все уровни blockquote*/
+    //     while((pt = pop()) != NULL) {
+    //         pt->close(pt);
+    //         printf("\n");
+    //     }
+    // }
 
     char spaceChar[100] = {0};
     int pos = 0;
@@ -783,10 +791,6 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
     }
     else
         ungetch(c);
-
-    // if(!isBlockquote && findByBlockType(BLOCKQUOTE)) {
-
-    // }
 
     /*внутри какого-то блока*/
     if((pt = peek()) != NULL) {
