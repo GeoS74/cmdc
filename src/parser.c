@@ -6,7 +6,7 @@
 void heading(void);
 void headingTrailingHashes(char *spaceChar, int *pos);
 
-void tabs(int *blankLines, int *lineStart, int *lastIndent);
+void tabs(int *blankLines, int *lineStart, int *lastIndent, int *blockquoteLine);
 void newLine(int *blankLines, int *lineStart);
 void paragraph(int *blankLines, int *lineStart);
 void printEscapedChar(int c);
@@ -25,6 +25,7 @@ void openCodeBlockFenced(int *blankLines, int *lineStart);
 void printBackTicks(void);
 
 void blockquote(int *blankLines, int *lineStart);
+void closeAllBlockquotes(void);
 
 void parser(void) {
     /*
@@ -40,12 +41,13 @@ void parser(void) {
     char spaceChar[100] = {0};
     int pos = 0;
 
-    int c, lineStart, blankLines, lastIndent;
+    int c, lineStart, blankLines, lastIndent, blockquoteLine;
     struct tag *pt;
 
     lineStart = 0;
     blankLines = 0;
     lastIndent = 0; /*кол-во отступов высчитаное функцией tabs, используется в thematicBreak*/
+    blockquoteLine = 0; /*флаг, определяющий что строка принадлежит блоку цитат*/
 
     while((c = getch()) != EOF) {
         ++lineStart;
@@ -56,11 +58,12 @@ void parser(void) {
         /*обработка отступов и пустых строк*/
         if(lineStart == 1 && isspace(c)) {
             ungetch(c);
-            tabs(&blankLines, &lineStart, &lastIndent);
+            tabs(&blankLines, &lineStart, &lastIndent, &blockquoteLine);
         }
         /*завершение строки*/
         else if(c == '\n') {
             lastIndent = 0; /*перенос строки сбрасывает отступы*/
+            blockquoteLine = 0;
             newLine(&blankLines, &lineStart);
         }
         /*заголовки*/
@@ -84,6 +87,10 @@ void parser(void) {
         else if(lineStart == 1) {
             ungetch(c);
 
+            /*закрыть все уровни blockquote*/
+            if(!blockquoteLine && c != '>' && findByBlockType(BLOCKQUOTE))
+                closeAllBlockquotes();
+
             if(c == '`' || c == '~')
                 if(isCodeBlockFenced())
                     codeBlockFenced(&blankLines, &lineStart, lastIndent);
@@ -92,8 +99,10 @@ void parser(void) {
 
             else if(c == '*' || c == '-' || c == '_') /*тематический разрыв*/
                 thematicBreak(&blankLines, &lineStart, lastIndent);
-            else if(c == '>') /*цитата*/
+            else if(c == '>') { /*цитата*/
+                blockquoteLine = 1;
                 blockquote(&blankLines, &lineStart);
+            }  
             else
                 paragraph(&blankLines, &lineStart);
         }
@@ -125,10 +134,11 @@ void parser(void) {
                 if(blankLines == 0)
                     printf("\n");
             }
-            else if(pt->type == BLOCKQUOTE) {
-                printf("\n");
-            }
             pt->close(pt);
+
+            /*проверить следующий тег в стеке*/
+            if(peek() != NULL && peek()->type == BLOCKQUOTE)
+                printf("\n");
         }
     }
 }
@@ -515,9 +525,11 @@ void openCodeBlockFenced(int *blankLines, int *lineStart) {
             pop();
         }
 
-        /*закрыть многострочный тег тег*/
-        popAndClose(blankLines, lineStart);
-        printf("\n");
+        /*закрыть многострочный тег тег, если это не блок цитат*/
+        if(peek() != NULL && peek()->type != BLOCKQUOTE) {
+            popAndClose(blankLines, lineStart);
+            printf("\n");
+        }
     }
 
     /*создать открывающий тег*/
@@ -642,12 +654,8 @@ void thematicBreak(int *blankLines, int *lineStart, int lastIndent) {
         printf("\n");
 
         /*закрыть все уровни blockquote*/
-        if((pt = peek()) != NULL && pt->type == BLOCKQUOTE) {
-            while((pt = pop()) != NULL) {
-                pt->close(pt);
-                printf("\n");
-            }
-        }
+        if((pt = peek()) != NULL && pt->type == BLOCKQUOTE)
+            closeAllBlockquotes();
 
         if(isBreaks) {
             printf("<hr />");
@@ -688,13 +696,9 @@ void paragraph(int *blankLines, int *lineStart) {
                 popAndClose(blankLines, lineStart);
                 printf("\n");
 
-                if(peek() && peek()->type == BLOCKQUOTE) {
-                    /*закрыть все уровни blockquote*/
-                    while((pt = pop()) != NULL) {
-                        pt->close(pt);
-                        printf("\n");
-                    }
-                }
+                /*закрыть все уровни blockquote*/
+                if(peek() && peek()->type == BLOCKQUOTE)
+                    closeAllBlockquotes();
             }
             else
                 printf("\n");
@@ -748,19 +752,9 @@ void newLine(int *blankLines, int *lineStart) {
     *blankLines = 0;
 }
 
-void tabs(int *blankLines, int *lineStart, int *lastIndent) {
+void tabs(int *blankLines, int *lineStart, int *lastIndent, int *blockquoteLine) {
     struct tag *pt;
     int indent, c;
-
-    /*если предыдущий символ это пробел, то строка входит в блок цитат*/
-    // int isBlockquoteLine = prevch() == ' ';
-    // if(!isBlockquoteLine && findByBlockType(BLOCKQUOTE)) {
-    //     /*закрыть все уровни blockquote*/
-    //     while((pt = pop()) != NULL) {
-    //         pt->close(pt);
-    //         printf("\n");
-    //     }
-    // }
 
     char spaceChar[100] = {0};
     int pos = 0;
@@ -784,6 +778,19 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
     }
     else
         ungetch(c);
+    
+
+    /*закрыть все уровни blockquote*/
+    /*ловит случай когда indent блок кода открыт внутри блока цитат, и надо его закрыть*/
+    if(indent >= TAB_STEP && *blockquoteLine == 0 && findByBlockType(BLOCKQUOTE)) {
+        /*здесь popAndClose не подходит, т.к. он обнулит lineStart*/
+        if((pt = pop())) {
+            pt->close(pt);
+            printf("\n");
+        }
+        closeAllBlockquotes();
+    }
+         
 
     /*внутри какого-то блока*/
     if((pt = peek()) != NULL) {
@@ -815,15 +822,15 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent) {
                 indent = 0;
         }
         else if(pt->type == BLOCKQUOTE) {
-            if(indent >= TAB_STEP) {
+            if(indent < TAB_STEP)
+                indent = 0;
+            else {
                 struct tag t = getTag(CODE_BLOCK);
                 t.kind = INDENTED;
                 push(t);
                 printf("<pre><code>");
                 *blankLines = 0;
             }
-            else 
-                indent = 0;
         }
     }
     /*вне блока*/
@@ -1043,4 +1050,14 @@ void popAndClose(int *blankLines, int *lineStart) {
     }
     *blankLines = 0;
     *lineStart = 0;
+}
+
+/*закрывает все открытые уровни блоков цитат*/
+void closeAllBlockquotes() {
+    struct tag *pt;
+    while((pt = peek()) != NULL && pt->type == BLOCKQUOTE) {
+        pt->close(pt);
+        printf("\n");
+        pop();
+    }
 }
