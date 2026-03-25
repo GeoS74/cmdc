@@ -455,14 +455,39 @@ int isCodeBlockFenced(void) {
 void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent){
     openCodeBlockFenced(blankLines, lineStart);
 
-    int c, indent, hasContent;
+    int c, indent, hasContent, blockquoteLine;
     indent = 0;
     hasContent = 0;
+    blockquoteLine = 0;
 
     while((c = getch()) != EOF) {
         if(c == ' ' && !hasContent) {
             ++indent;
             continue;
+        }
+
+        /*внутри блока цитат*/
+        if(findByBlockType(BLOCKQUOTE) && !hasContent) {
+            if(!blockquoteLine && (c != '>' || indent >= TAB_STEP)) {
+                popAndClose(blankLines, lineStart);
+                printf("\n");
+                closeAllBlockquotes();
+                ungetch(c);
+                while(indent-- > 0)
+                    ungetch(' ');
+                /*добавить в поток символ переноса строки для функции bufferInlineSpaces*/
+                ungetch('\n');
+                break;
+            }
+            else if(c == '>') {
+                hasContent = 1;
+                blockquoteLine = 1;
+                indent = 0;
+                /*убрать один пробел после символа >*/
+                if((c = getch()) != ' ')
+                    ungetch(c);
+                continue;
+            }
         }
 
         if(c == '\n') {
@@ -472,10 +497,11 @@ void codeBlockFenced(int *blankLines, int *lineStart, int lastIndent){
             printf("\n");
             hasContent = 0;
             indent = 0;
+            blockquoteLine = 1;
             continue;
         }
 
-        if(indent < 4) {
+        if(indent < TAB_STEP) {
             if((c == '`' && peek()->kind == FENCED_BACKTICK) || 
                (c == '~' && peek()->kind == FENCED_TILDE)) {
 
