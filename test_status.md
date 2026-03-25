@@ -1070,6 +1070,20 @@
     <pre><code>bar
     </code></pre>
     ```
+- [x] Example 237:
+    `````
+    >·```
+    foo
+    ```
+    `````
+    ->
+    ```
+    <blockquote>
+    <pre><code></code></pre>
+    </blockquote>
+    <p>foo</p>
+    <pre><code></code></pre>
+    ```
 
 
 ### Code spans
