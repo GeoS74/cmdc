@@ -1055,6 +1055,21 @@
     <li>bar</li>
     </ul>
     ```
+- [x] Example 236:
+    ```
+    >····foo
+    ····bar
+    ---
+    ```
+    ->
+    ```
+    <blockquote>
+    <pre><code>foo
+    </code></pre>
+    </blockquote>
+    <pre><code>bar
+    </code></pre>
+    ```
 
 
 ### Code spans
