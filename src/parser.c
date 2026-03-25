@@ -804,17 +804,18 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent, int *blockquoteLine)
     }
     else
         ungetch(c);
-    
 
     /*закрыть все уровни blockquote*/
     /*ловит случай когда indent блок кода открыт внутри блока цитат, и надо его закрыть*/
-    if(indent >= TAB_STEP && *blockquoteLine == 0 && findByBlockType(BLOCKQUOTE)) {
-        /*здесь popAndClose не подходит, т.к. он обнулит lineStart*/
-        if((pt = pop())) {
-            pt->close(pt);
-            printf("\n");
+     if(indent >= TAB_STEP && *blockquoteLine == 0 && findByBlockType(BLOCKQUOTE)) {
+        if((pt = peek()) != NULL && pt->type == CODE_BLOCK && pt->kind == INDENTED) {
+            /*здесь popAndClose не подходит, т.к. он обнулит lineStart*/
+            if((pt = pop())) {
+                pt->close(pt);
+                printf("\n");
+            }
+            closeAllBlockquotes();
         }
-        closeAllBlockquotes();
     }
          
 

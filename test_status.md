@@ -1084,6 +1084,50 @@
     <p>foo</p>
     <pre><code></code></pre>
     ```
+- [x] Example 238:
+    ```
+    >·foo
+    ····-·bar
+    ```
+    ->
+    ```
+    <blockquote>
+    <p>foo
+    - bar</p>
+    </blockquote>
+    ```
+- [x] Example 239:
+    ```
+    >
+    ```
+    ->
+    ```
+    <blockquote>
+    </blockquote>
+    ```
+- [x] Example 240:
+    ```
+    >
+    >··
+    >·
+    ```
+    ->
+    ```
+    <blockquote>
+    </blockquote>
+    ```
+- [x] Example 241:
+    ```
+    >
+    >·foo
+    >··
+    ```
+    ->
+    ```
+    <blockquote>
+    <p>foo</p>
+    </blockquote>
+    ```
 
 
 ### Code spans
