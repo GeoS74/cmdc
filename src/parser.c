@@ -151,6 +151,14 @@ void blockquote(int *blankLines, int *lineStart) {
     char spaceChar[100];
     int pos = 0;
 
+    /*проверить наличие пустых строк перед блоком цитат (см. пример 242)*/
+    if(*blankLines > 0 && (pt = peek()) != NULL && pt->type != BLOCKQUOTE) {
+        popAndClose(blankLines, lineStart);
+        printf("\n");
+        closeAllBlockquotes();
+        return;
+    }
+
     level = 0;
     indent = 0;
     while((c = getch()) == '>' || c == ' ' || c == '\t') {
