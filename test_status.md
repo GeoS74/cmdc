@@ -1128,7 +1128,7 @@
     <p>foo</p>
     </blockquote>
     ```
-- [ ] Example 242:
+- [x] Example 242:
     ```
     >·foo
 
@@ -1143,8 +1143,147 @@
     <p>bar</p>
     </blockquote>
     ```
+- [x] Example 243:
+    ```
+    >·foo
+    >·bar
+    ```
+    ->
+    ```
+    <blockquote>
+    <p>foo
+    bar</p>
+    </blockquote>
+    ```
+- [x] Example 244:
+    ```
+    >·foo
+    >
+    >·bar
+    ```
+    ->
+    ```
+    <blockquote>
+    <p>foo</p>
+    <p>bar</p>
+    </blockquote>
+    ```
+- [x] Example 245:
+    ```
+    foo
+    >·bar
+    ```
+    ->
+    ```
+    <p>foo</p>
+    <blockquote>
+    <p>bar</p>
+    </blockquote>
+    ```
+- [x] Example 246:
+    ```
+    >·aaa
+    ***
+    >·bbb
+    ```
+    ->
+    ```
+    <blockquote>
+    <p>aaa</p>
+    </blockquote>
+    <hr />
+    <blockquote>
+    <p>bbb</p>
+    </blockquote>
+    ```
+- [x] Example 247:
+    ```
+    >·bar
+    baz
+    ```
+    ->
+    ```
+    <blockquote>
+    <p>bar
+    baz</p>
+    </blockquote>
+    ```
+- [x] Example 248:
+    ```
+    >·bar
 
+    baz
+    ```
+    ->
+    ```
+    <blockquote>
+    <p>bar</p>
+    </blockquote>
+    <p>baz</p>
+    ```
+- [x] Example 249:
+    ```
+    >·bar
+    >
+    baz
+    ```
+    ->
+    ```
+    <blockquote>
+    <p>bar</p>
+    </blockquote>
+    <p>baz</p>
+    ```
+- [x] Example 250:
+    ```
+    >·>·>·foo
+    bar
+    ```
+    ->
+    ```
+    <blockquote>
+    <blockquote>
+    <blockquote>
+    <p>foo
+    bar</p>
+    </blockquote>
+    </blockquote>
+    </blockquote>
+    ```
+- [x] Example 251:
+    ```
+    >>>·foo
+    >·bar
+    >>baz
+    ```
+    ->
+    ```
+    <blockquote>
+    <blockquote>
+    <blockquote>
+    <p>foo
+    bar
+    baz</p>
+    </blockquote>
+    </blockquote>
+    </blockquote>
+    ```
+- [x] Example 252:
+    ```
+    >·····code
 
+    >····not code
+    ```
+    ->
+    ```
+    <blockquote>
+    <pre><code>code
+    </code></pre>
+    </blockquote>
+    <blockquote>
+    <p>not code</p>
+    </blockquote>
+    ```
 ### Code spans
 - [x] Example 327:
     ```

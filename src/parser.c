@@ -151,14 +151,6 @@ void blockquote(int *blankLines, int *lineStart) {
     char spaceChar[100];
     int pos = 0;
 
-    /*проверить наличие пустых строк перед блоком цитат (см. пример 242)*/
-    if(*blankLines > 0 && (pt = peek()) != NULL && pt->type != BLOCKQUOTE) {
-        popAndClose(blankLines, lineStart);
-        printf("\n");
-        closeAllBlockquotes();
-        return;
-    }
-
     level = 0;
     indent = 0;
     while((c = getch()) == '>' || c == ' ' || c == '\t') {
@@ -186,6 +178,13 @@ void blockquote(int *blankLines, int *lineStart) {
         это странно*/
         while(pos > 1)
             ungetch(spaceChar[--pos]);
+    }
+
+    /*проверить наличие пустых строк перед блоком цитат (см. пример 242)*/
+    if(*blankLines > 0 && (pt = peek()) != NULL && pt->type != BLOCKQUOTE) {
+        popAndClose(blankLines, lineStart);
+        printf("\n");
+        closeAllBlockquotes();
     }
 
     blockquote = findByBlockType(BLOCKQUOTE);
@@ -808,6 +807,16 @@ void tabs(int *blankLines, int *lineStart, int *lastIndent, int *blockquoteLine)
     if(c == '\n' || c == EOF) {
         ++*blankLines;
         *lineStart = 0;
+
+        /*пустая строка в блоке цитат*/
+        if(*blockquoteLine == 1) {
+            *blankLines = 0;
+            *blockquoteLine = 0;
+            if((pt = peek()) != NULL && pt->type != BLOCKQUOTE) {
+                popAndClose(blankLines, lineStart);
+                printf("\n");
+            }
+        }
         return;
     }
     else
